@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.AnalogEncoder;
 
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -31,7 +32,7 @@ public class SwerveModule implements CheckableSubsystem {
   private final TalonFX driveMotor;
   private final SparkMax turningMotor;
 
-  private final AbsoluteEncoder m_turningEncoder;
+  private final AnalogEncoder m_turningEncoder;
 
   private final SparkClosedLoopController m_turningClosedLoopController;
 
@@ -51,7 +52,7 @@ public class SwerveModule implements CheckableSubsystem {
     driveMotor = new TalonFX(drivingCANId);
     turningMotor = new SparkMax(turningCANId, MotorType.kBrushless);
 
-    m_turningEncoder = turningMotor.getAbsoluteEncoder();
+    m_turningEncoder = new AnalogEncoder(0);
 
     m_turningClosedLoopController = turningMotor.getClosedLoopController();
 
@@ -68,7 +69,7 @@ public class SwerveModule implements CheckableSubsystem {
     driveTalonConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     driveTalonConfig.Feedback.SensorToMechanismRatio = drivingFactor;
 
-    driveTalonConfig.Slot0.kP = 0.04;
+    driveTalonConfig.Slot0.kP = 0.05;
     driveTalonConfig.Slot0.kI = 0;
     driveTalonConfig.Slot0.kD = 0;
 
@@ -87,7 +88,7 @@ public class SwerveModule implements CheckableSubsystem {
     turningConfig.closedLoop
         .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
         // These are example gains you may need to them for your own robot!
-        .pid(1, 0, 0)
+        .pid(0.01, 0, 0)
         .outputRange(-1, 1)
         // Enable PID wrap around for the turning motor. This will allow the PID
         // controller to go through 0 to get to the setpoint i.e. going from 350 degrees
@@ -103,7 +104,7 @@ public class SwerveModule implements CheckableSubsystem {
         PersistMode.kPersistParameters);
 
     m_chassisAngularOffset = chassisAngularOffset;
-    m_desiredState.angle = new Rotation2d(m_turningEncoder.getPosition());
+    m_desiredState.angle = new Rotation2d(m_turningEncoder.get());
     driveMotor.setPosition(0);
 
     initialized = true;
@@ -119,7 +120,7 @@ public class SwerveModule implements CheckableSubsystem {
     // Apply chassis angular offset to the encoder position to get the position
     // relative to the chassis.
     return new SwerveModuleState(driveMotor.getVelocity().getValueAsDouble(),
-        new Rotation2d(m_turningEncoder.getPosition() - m_chassisAngularOffset));
+        new Rotation2d(m_turningEncoder.get() - m_chassisAngularOffset));
   }
 
   /**
@@ -133,7 +134,7 @@ public class SwerveModule implements CheckableSubsystem {
     // relative to the chassis.
     return new SwerveModulePosition(
         driveMotor.getPosition().getValueAsDouble(),
-        new Rotation2d(m_turningEncoder.getPosition() - m_chassisAngularOffset));
+        new Rotation2d(m_turningEncoder.get() - m_chassisAngularOffset));
   }
 
   /**
@@ -148,7 +149,7 @@ public class SwerveModule implements CheckableSubsystem {
     correctedDesiredState.angle = desiredState.angle.plus(Rotation2d.fromRadians(m_chassisAngularOffset));
 
     // Optimize the reference state to avoid spinning further than 90 degrees.
-    correctedDesiredState.optimize(new Rotation2d(m_turningEncoder.getPosition()));
+    correctedDesiredState.optimize(new Rotation2d(m_turningEncoder.get()));
 
     // Command driving and turning motors towards their respective setpoints.
     driveMotor.setControl(new VelocityDutyCycle(correctedDesiredState.speedMetersPerSecond).withFeedForward(ModuleConstants.DRIVING_VELOCITY_FEED_FORWARD));
