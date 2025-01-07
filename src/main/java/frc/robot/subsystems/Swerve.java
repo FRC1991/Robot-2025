@@ -293,6 +293,20 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
     m_rearRight.setDesiredState(desiredStates[3]);
   }
 
+  /**
+   * Gets the current module states
+   * 
+   * @return Swerve module states of the robot
+   */
+  public SwerveModuleState[] getModuleStates() {
+    return new SwerveModuleState[] {
+        m_frontLeft.getState(),
+        m_frontRight.getState(),
+        m_rearLeft.getState(),
+        m_rearRight.getState()
+    };
+  }
+
   /** Resets the drive encoders to currently read a position of 0. */
   public void resetDriveEncoders() {
     m_frontLeft.resetDriveEncoder();
