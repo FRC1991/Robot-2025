@@ -21,7 +21,6 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.revrobotics.AbsoluteEncoder;
 
 import frc.robot.Constants.ModuleConstants;
 
@@ -41,18 +40,17 @@ public class SwerveModule implements CheckableSubsystem {
 
   /**
    * Constructs a SwerveModule and configures the driving and turning motor,
-   * encoder, and PID controller. This configuration is specific to the REV
-   * MAXSwerve Module built with NEOs, SPARKS MAX, and a Through Bore
-   * Encoder.
+   * encoder, and PID controller. This robot uses the MK4 swerve modules
+   * with a Krakenx60 as the drive motor and a Neo as the azimuth (turning) motor.
    *
-   * I am NOT using getInstance() here because we intend to have multiple
+   * Do NOT use getInstance() because we intend to have multiple
    * instances of this class.
    */
-  public SwerveModule(int drivingCANId, int turningCANId, double chassisAngularOffset) {
+  public SwerveModule(int drivingCANId, int turningCANId, int encoderChannel, double chassisAngularOffset) {
     driveMotor = new TalonFX(drivingCANId);
     turningMotor = new SparkMax(turningCANId, MotorType.kBrushless);
 
-    m_turningEncoder = new AnalogEncoder(0);
+    m_turningEncoder = new AnalogEncoder(encoderChannel);
 
     m_turningClosedLoopController = turningMotor.getClosedLoopController();
 
@@ -73,18 +71,9 @@ public class SwerveModule implements CheckableSubsystem {
     driveTalonConfig.Slot0.kI = 0;
     driveTalonConfig.Slot0.kD = 0;
 
-    driveMotor.getConfigurator().apply(driveTalonConfig, 0.1);
-    driveMotor.optimizeBusUtilization(0, 0.1);
-
     turningConfig
         .idleMode(IdleMode.kBrake)
-        .smartCurrentLimit(20);
-    turningConfig.absoluteEncoder
-        // Invert the turning encoder, since the output shaft rotates in the opposite
-        // direction of the steering motor in the MAXSwerve Module.
-        .inverted(true)
-        .positionConversionFactor(turningFactor) // radians
-        .velocityConversionFactor(turningFactor / 60.0); // radians per second
+        .smartCurrentLimit(40);
     turningConfig.closedLoop
         .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
         // These are example gains you may need to them for your own robot!
@@ -97,9 +86,11 @@ public class SwerveModule implements CheckableSubsystem {
         .positionWrappingEnabled(true)
         .positionWrappingInputRange(0, turningFactor);
 
-    // Apply the respective configurations to the SPARKS. Reset parameters before
-    // applying the configuration to bring the SPARK to a known good state. Persist
-    // the settings to the SPARK to avoid losing them on a power cycle.
+    // Apply the configuration to the motor, so it is always in
+    // a consistent state regardless of what has happened to the
+    // hardware (being replaced, factory reset, new firmware, etc)
+    driveMotor.getConfigurator().apply(driveTalonConfig, 0.1);
+    driveMotor.optimizeBusUtilization(0, 0.1);
     turningMotor.configure(turningConfig, ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
 
@@ -177,8 +168,6 @@ public class SwerveModule implements CheckableSubsystem {
    */
   @Override
   public boolean checkSubsystem() {
-    // status = Utils.checkMotor(driveMotor, driveMotor.getDeviceId());
-    // status &= Utils.checkMotor(turningMotor, turningMotor.getDeviceId());
     status &= getInitialized();
 
     return status;
