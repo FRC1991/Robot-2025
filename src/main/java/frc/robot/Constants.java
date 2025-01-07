@@ -11,15 +11,20 @@ import edu.wpi.first.math.util.Units;
 /** 
  * Holds all constants for the robot.
  * 
- * This class is abstract to prevent instantiation. All constants should have
- * the public, static, and final, modifiers and follow a consistent naming
- * structure.
+ * This class is abstract and has a private constructor to prevent instantiation.
+ * All constants should have the public, static, and final,
+ * modifiers and follow a consistent naming structure.
  */
 public abstract class Constants {
+  private Constants() {}
+  
   public static final double LIMELIGHT_HEIGHT = 0;
   public static final double APRILTAG_HEIGHT = 0;
 
   public static abstract class SwerveConstants {
+    // The speed modifier for the swerve drive as a percent
+    public static final double SPEED_SCALE = 0.4;
+
     // Chassis configuration
     public static final double TRACK_WIDTH = Units.inchesToMeters(99);
     // Distance between centers of right and left wheels on robot
@@ -36,12 +41,21 @@ public abstract class Constants {
     public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = 0;
     public static final double BACK_LEFT_CHASSIS_ANGULAR_OFFSET = Math.PI;
     public static final double BACK_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.PI / 2;
+
+    public static final boolean GYRO_REVERSED = false;
+
+    // Driving Parameters - Note that these are not the maximum capable speeds of
+    // the robot, rather the allowed maximum speeds
+    public static final double MAX_SPEED_METERS_PER_SECOND = 4.8;
+    public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2 * Math.PI; // radians per second
   }
 
   public static abstract class ModuleConstants {
+    // The standard size for Billet wheels which come standard with the MK4 modules
     public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(4);
     // This is the L1 gear reduction on the MK4 modules 
     public static final double DRIVING_MOTOR_REDUCTION = 8.14;
+    // The driving motor is a Krakenx60 without FOC
     public static final double DRIVING_MOTOR_FREE_SPEED_RPM = 5800;
     public static final double DRIVING_VELOCITY_FEED_FORWARD = 1 / ModuleConstants.DRIVING_MOTOR_FREE_SPEED_RPM;
   }
@@ -49,18 +63,28 @@ public abstract class Constants {
   // CAN IDs for every CAN device on the robot
   public static abstract class CANConstants {
     // Swerve driving motors
-    public static final int FRONT_LEFT_DRIVING_CANID = 2;
-    public static final int FRONT_RIGHT_DRIVING_CANID = 3;
-    public static final int BACK_LEFT_DRIVING_CANID = 4;
-    public static final int BACK_RIGHT_DRIVING_CANID = 5;
+    public static final int FRONT_LEFT_DRIVING_ID = 2;
+    public static final int FRONT_RIGHT_DRIVING_ID = 3;
+    public static final int BACK_LEFT_DRIVING_ID = 4;
+    public static final int BACK_RIGHT_DRIVING_ID = 5;
 
     // Swerve turning motors
-    public static final int FRONT_LEFT_TURNING_CANID = 6;
-    public static final int FRONT_RIGHT_TURNING_CANID = 7;
-    public static final int BACK_LEFT_TURNING_CANID = 8;
-    public static final int BACK_RIGHT_TURNING_CANID = 9;
+    public static final int FRONT_LEFT_TURNING_ID = 6;
+    public static final int FRONT_RIGHT_TURNING_ID = 7;
+    public static final int BACK_LEFT_TURNING_ID = 8;
+    public static final int BACK_RIGHT_TURNING_ID = 9;
+
+    public static final int FL_ENCODER_ANALOG_INPUT_CHANNEL = 0;
+    public static final int FR_ENCODER_ANALOG_INPUT_CHANNEL = 1;
+    public static final int BL_ENCODER_ANALOG_INPUT_CHANNEL = 2;
+    public static final int BR_ENCODER_ANALOG_INPUT_CHANNEL = 3;
 
     // Gyro
-    public static final int GYRO_CANID = 10;
+    public static final int GYRO_ID = 10;
+  }
+
+  public static abstract class OIConstants {
+    public static final int DRIVER_CONTROLLER_PORT = 0;
+    public static final double DRIVER_DEADBAND = 0.05;
   }
 }

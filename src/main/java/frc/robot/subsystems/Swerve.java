@@ -4,18 +4,12 @@
 
 package frc.robot.subsystems;
 
-import java.util.NoSuchElementException;
 import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-import com.pathplanner.lib.util.PIDConstants;
-import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -23,57 +17,48 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.DriverStation;
-import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.CANConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.Constants.TeleopConstants;
-import frc.robot.OperatingInterface;
-import frc.utils.SwerveUtils;
+import frc.robot.Constants.SwerveConstants;
+import frc.robot.OI;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSubsystem {
   // Create SwerveModules
   private final SwerveModule m_frontLeft = new SwerveModule(
-      DriveConstants.kFrontLeftDrivingCanId,
-      DriveConstants.kFrontLeftTurningCanId,
-      DriveConstants.kFrontLeftChassisAngularOffset);
+      CANConstants.FRONT_LEFT_DRIVING_ID,
+      CANConstants.FRONT_LEFT_TURNING_ID,
+      CANConstants.FL_ENCODER_ANALOG_INPUT_CHANNEL,
+      SwerveConstants.FRONT_LEFT_CHASSIS_ANGULAR_OFFSET);
 
   private final SwerveModule m_frontRight = new SwerveModule(
-      DriveConstants.kFrontRightDrivingCanId,
-      DriveConstants.kFrontRightTurningCanId,
-      DriveConstants.kFrontRightChassisAngularOffset);
+      CANConstants.FRONT_RIGHT_DRIVING_ID,
+      CANConstants.FRONT_RIGHT_TURNING_ID,
+      CANConstants.FR_ENCODER_ANALOG_INPUT_CHANNEL,
+      SwerveConstants.FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET);
 
   private final SwerveModule m_rearLeft = new SwerveModule(
-      DriveConstants.kRearLeftDrivingCanId,
-      DriveConstants.kRearLeftTurningCanId,
-      DriveConstants.kBackLeftChassisAngularOffset);
+      CANConstants.BACK_LEFT_DRIVING_ID,
+      CANConstants.BACK_LEFT_TURNING_ID,
+      CANConstants.BL_ENCODER_ANALOG_INPUT_CHANNEL,
+      SwerveConstants.BACK_LEFT_CHASSIS_ANGULAR_OFFSET);
 
   private final SwerveModule m_rearRight = new SwerveModule(
-      DriveConstants.kRearRightDrivingCanId,
-      DriveConstants.kRearRightTurningCanId,
-      DriveConstants.kBackRightChassisAngularOffset);
+      CANConstants.BACK_RIGHT_DRIVING_ID,
+      CANConstants.BACK_RIGHT_TURNING_ID,
+      CANConstants.BR_ENCODER_ANALOG_INPUT_CHANNEL,
+      SwerveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET);
 
   private boolean status = false;
   private boolean initialized = false;
 
   // The gyro sensor
-  public final Pigeon2 m_gyro = new Pigeon2(DriveConstants.kGyroId);
-
-  // Slew rate filter variables for controlling lateral acceleration
-  private double m_currentRotation = 0.0;
-  private double m_currentTranslationDir = 0.0;
-  private double m_currentTranslationMag = 0.0;
-
-  private SlewRateLimiter m_magLimiter = new SlewRateLimiter(DriveConstants.kMagnitudeSlewRate);
-  private SlewRateLimiter m_rotLimiter = new SlewRateLimiter(DriveConstants.kRotationalSlewRate);
-  private double m_prevTime = WPIUtilJNI.now() * 1e-6;
-  //private double speedScale;
+  public final Pigeon2 m_gyro = new Pigeon2(CANConstants.GYRO_ID);
 
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
-      DriveConstants.kDriveKinematics,
+      SwerveConstants.DRIVE_KINEMATICS,
       Rotation2d.fromDegrees(getHeading()),
       new SwerveModulePosition[] {
           m_frontLeft.getPosition(),
@@ -90,8 +75,6 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
 
   private PIDController angleController = new PIDController(0.009, 0, 0);
 
-  private double sourceAngle = -1;
-
   private DoubleSupplier aimingAngle;
 
   // Constructor is private to prevent multiple instances from being made
@@ -100,53 +83,6 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
     angleController.enableContinuousInput(0, 360);
 
     zeroHeading();
-
-    // Configure AutoBuilder last
-    AutoBuilder.configureHolonomic(
-            this::getPose, // Robot pose supplier
-            this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
-            this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-            this::drive, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-            new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
-                    new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-                    new PIDConstants(0.009, 0.0, 0.0), // Rotation PID constants
-                    4.5, // Max module speed, in m/s
-                    //TODO calculate real radius, with bumpers on
-                    0.4, // Drive base radius in meters. Distance from robot center to furthest module.
-                    new ReplanningConfig() // Default path replanning config. See the API for the options here
-            ),
-            () -> {
-              // Boolean supplier that controls when the path will be mirrored for the red alliance
-              // This will flip the path being followed to the red side of the field.
-              // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-
-              var alliance = DriverStation.getAlliance();
-              if (alliance.isPresent()) {
-                return alliance.get() == DriverStation.Alliance.Red;
-              }
-              return false;
-            },
-            this // Reference to this subsystem to set requirements
-    );
-
-    // Continuously checks for alliance until correct angle is chosen
-    try {
-      if(DriverStation.getAlliance().get().equals(DriverStation.Alliance.Blue)) {
-        sourceAngle = 145;
-      } else {
-        // RED_SIDE_ANGLE = ((180 - BLUE_SIDE_ANGLE) + 180)
-        sourceAngle = 215;
-      }
-      initialized = true;
-    } catch(NoSuchElementException e) {
-      /*
-       * I like blue alliance better, so I'm setting the angle to blue
-       * if we aren't connected to the driver station.
-       * 75% of people also like blue alliance best according to our
-       * silly goofy pit scouting at BattleCry 2024
-       */
-      sourceAngle = 145;
-    }
   }
 
   /**
@@ -236,7 +172,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
    * @param t ChassisSpeeds relative to the robot
    */
   private void drive(ChassisSpeeds t) {
-    var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(t);
+    var swerveModuleStates = SwerveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(t);
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
@@ -251,74 +187,25 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
    * @param rot           Angular rate of the robot.
    * @param fieldRelative Whether the provided x and y speeds are relative to the
    *                      field.
-   * @param rateLimit     Whether to enable rate limiting for smoother control.
    */
-  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative, boolean rateLimit) {
-
-    double xSpeedCommanded;
-    double ySpeedCommanded;
-
-    if (rateLimit) {
-      // Convert XY to polar for rate limiting
-      double inputTranslationDir = Math.atan2(ySpeed, xSpeed);
-      double inputTranslationMag = Math.sqrt(Math.pow(xSpeed, 2) + Math.pow(ySpeed, 2));
-
-      // Calculate the direction slew rate based on an estimate of the lateral acceleration
-      double directionSlewRate;
-      if (m_currentTranslationMag != 0.0) {
-        directionSlewRate = Math.abs(DriveConstants.kDirectionSlewRate / m_currentTranslationMag);
-      } else {
-        directionSlewRate = 500.0; //some high number that means the slew rate is effectively instantaneous
-      }
-
-
-      double currentTime = WPIUtilJNI.now() * 1e-6;
-      double elapsedTime = currentTime - m_prevTime;
-      double angleDif = SwerveUtils.AngleDifference(inputTranslationDir, m_currentTranslationDir);
-      if (angleDif < 0.45*Math.PI) {
-        m_currentTranslationDir = SwerveUtils.StepTowardsCircular(m_currentTranslationDir, inputTranslationDir, directionSlewRate * elapsedTime);
-        m_currentTranslationMag = m_magLimiter.calculate(inputTranslationMag);
-      }
-      else if (angleDif > 0.85*Math.PI) {
-        if (m_currentTranslationMag > 1e-4) { //some small number to avoid floating-point errors with equality checking
-          // keep currentTranslationDir unchanged
-          m_currentTranslationMag = m_magLimiter.calculate(0.0);
-        }
-        else {
-          m_currentTranslationDir = SwerveUtils.WrapAngle(m_currentTranslationDir + Math.PI);
-          m_currentTranslationMag = m_magLimiter.calculate(inputTranslationMag);
-        }
-      }
-      else {
-        m_currentTranslationDir = SwerveUtils.StepTowardsCircular(m_currentTranslationDir, inputTranslationDir, directionSlewRate * elapsedTime);
-        m_currentTranslationMag = m_magLimiter.calculate(0.0);
-      }
-      m_prevTime = currentTime;
-
-      xSpeedCommanded = m_currentTranslationMag * Math.cos(m_currentTranslationDir);
-      ySpeedCommanded = m_currentTranslationMag * Math.sin(m_currentTranslationDir);
-      m_currentRotation = m_rotLimiter.calculate(rot);
-
-
-    } else {
-      xSpeedCommanded = xSpeed;
-      ySpeedCommanded = ySpeed;
-      m_currentRotation = rot;
-    }
+  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
+    // Convert XY to polar for rate limiting
+    // double inputTranslationDir = Math.atan2(ySpeed, xSpeed);
+    // double inputTranslationMag = Math.sqrt(Math.pow(xSpeed, 2) + Math.pow(ySpeed, 2));
 
     // Convert the commanded speeds into the correct units for the drivetrain and scaling the speed
-    double xSpeedDelivered = xSpeedCommanded * DriveConstants.kMaxSpeedMetersPerSecond;
-    double ySpeedDelivered = ySpeedCommanded * DriveConstants.kMaxSpeedMetersPerSecond;
-    double rotDelivered = m_currentRotation * DriveConstants.kMaxAngularSpeed;
+    double xSpeedDelivered = xSpeed * SwerveConstants.MAX_SPEED_METERS_PER_SECOND;
+    double ySpeedDelivered = ySpeed * SwerveConstants.MAX_SPEED_METERS_PER_SECOND;
+    double rotDelivered = rot * SwerveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
 
     m_RobotChassisSpeeds = new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered);
 
-    var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
+    var swerveModuleStates = SwerveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
         fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(getHeading()))
             : m_RobotChassisSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+        swerveModuleStates, SwerveConstants.MAX_SPEED_METERS_PER_SECOND);
 
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
     m_frontRight.setDesiredState(swerveModuleStates[1]);
@@ -337,12 +224,12 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
    * @param rateLimit     Whether to enable rate limiting for smoother control.
    * @param speedScale    A percent to shrink the robot speed by. Must be between 0-1.
    */
-  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative, boolean rateLimit, double speedScale) {
+  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative, double speedScale) {
     xSpeed *= speedScale;
     ySpeed *= speedScale;
     rot *= speedScale + ((1 - speedScale) / 2);
 
-    drive(xSpeed, ySpeed, rot, fieldRelative, rateLimit);
+    drive(xSpeed, ySpeed, rot, fieldRelative);
   }
 
   /**
@@ -372,7 +259,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
    */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        desiredStates, DriveConstants.kMaxSpeedMetersPerSecond);
+        desiredStates, SwerveConstants.MAX_SPEED_METERS_PER_SECOND);
     m_frontLeft.setDesiredState(desiredStates[0]);
     m_frontRight.setDesiredState(desiredStates[1]);
     m_rearLeft.setDesiredState(desiredStates[2]);
@@ -380,11 +267,11 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
   }
 
   /** Resets the drive encoders to currently read a position of 0. */
-  public void resetEncoders() {
-    m_frontLeft.resetEncoders();
-    m_rearLeft.resetEncoders();
-    m_frontRight.resetEncoders();
-    m_rearRight.resetEncoders();
+  public void resetDriveEncoders() {
+    m_frontLeft.resetDriveEncoder();
+    m_rearLeft.resetDriveEncoder();
+    m_frontRight.resetDriveEncoder();
+    m_rearRight.resetDriveEncoder();
   }
 
   /** Zeroes the heading of the robot. */
@@ -398,7 +285,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
    * @return the robot's heading in degrees, from [0, 360)
    */
   public double getHeading() {
-    return Units.radiansToDegrees(SwerveUtils.WrapAngle(Rotation2d.fromDegrees(m_gyro.getYaw().getValueAsDouble()).getRadians()));
+    return MathUtil.inputModulus(m_gyro.getRotation2d().getDegrees(), 0, 360);
   }
 
   /**
@@ -406,16 +293,8 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
    *
    * @return the robot's heading in degrees (180, -180), optimized for the TurnToAngle PID command
    */
-  public double getHeadingTurnToAngle(double target) {
-    double angle = Units.radiansToDegrees(SwerveUtils.WrapAngle(Rotation2d.fromDegrees(m_gyro.getYaw().getValueAsDouble()).getRadians()));
-
-    if(angle > (target + 180)) {
-      angle -= 360;
-    } else if(angle < (target - 180)) {
-      angle += 360;
-    }
-
-    return angle;
+  public double getHeadingAroundAngle(double target) {
+    return MathUtil.inputModulus(target - m_gyro.getRotation2d().getDegrees(), -180, 180);
   }
   /**
    * Returns the turn rate of the robot.
@@ -423,7 +302,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
    * @return The turn rate of the robot, in degrees per second
    */
   public double getTurnRate() {
-    return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+    return m_gyro.getAngularVelocityZWorld().getValueAsDouble() * (SwerveConstants.GYRO_REVERSED ? -1.0 : 1.0);
   }
 
   /**
@@ -473,28 +352,19 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
       case DRIVE:
         if(DriverStation.isTeleopEnabled()) {
           drive(
-            -MathUtil.applyDeadband(OperatingInterface.driverJoytick.getRawAxis(1), OIConstants.kDriveDeadband),
-            -MathUtil.applyDeadband(OperatingInterface.driverJoytick.getRawAxis(0), OIConstants.kDriveDeadband),
-            -MathUtil.applyDeadband(OperatingInterface.driverJoytick.getRawAxis(2), OIConstants.kDriveDeadband),
-            true, false, TeleopConstants.kSwerveSpeed);
-        }
-        break;
-      case PICKUP:
-        if(DriverStation.isTeleopEnabled()) {
-          drive(
-              -MathUtil.applyDeadband(OperatingInterface.driverJoytick.getRawAxis(1), OIConstants.kDriveDeadband),
-              -MathUtil.applyDeadband(OperatingInterface.driverJoytick.getRawAxis(0), OIConstants.kDriveDeadband),
-              angleController.calculate(getHeading()),
-              true, false, TeleopConstants.kSwerveSpeed * 0.6);
+            -MathUtil.applyDeadband(OI.driverJoytick.getRawAxis(1), OIConstants.DRIVER_DEADBAND),
+            -MathUtil.applyDeadband(OI.driverJoytick.getRawAxis(0), OIConstants.DRIVER_DEADBAND),
+            -MathUtil.applyDeadband(OI.driverJoytick.getRawAxis(2), OIConstants.DRIVER_DEADBAND),
+            true, SwerveConstants.SPEED_SCALE);
         }
         break;
       case AIMING:
         if(DriverStation.isTeleopEnabled()) {
           drive(
-              -MathUtil.applyDeadband(OperatingInterface.driverJoytick.getRawAxis(1), OIConstants.kDriveDeadband),
-              -MathUtil.applyDeadband(OperatingInterface.driverJoytick.getRawAxis(0), OIConstants.kDriveDeadband),
+              -MathUtil.applyDeadband(OI.driverJoytick.getRawAxis(1), OIConstants.DRIVER_DEADBAND),
+              -MathUtil.applyDeadband(OI.driverJoytick.getRawAxis(0), OIConstants.DRIVER_DEADBAND),
               angleController.calculate(aimingAngle.getAsDouble()),
-              true, false, TeleopConstants.kSwerveSpeed);
+              true, SwerveConstants.SPEED_SCALE);
         }
         break;
       case LOCKED:
@@ -516,15 +386,12 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
   public void handleStateTransition() {
     switch(desiredState) {
       case IDLE:
-        drive(0,0,0,false,false);
+        drive(0,0,0,false);
         break;
       case BROKEN:
         stop();
         break;
       case DRIVE:
-        break;
-      case PICKUP:
-        angleController.setSetpoint(sourceAngle);
         break;
       case AIMING:
         angleController.setSetpoint(0);
@@ -545,7 +412,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
    * @param state Desired state
    */
   public void setDesiredState(SwerveStates state) {
-    if(this.desiredState != state /*&& this.currentState != SwerveStates.BROKEN*/) {
+    if(this.desiredState != state) {
       desiredState = state;
       handleStateTransition();
     }
@@ -558,17 +425,16 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
     return currentState;
   }
 
+  /**
+   * The list of possible states for this subsystem
+   */
   public enum SwerveStates {
     IDLE,
     BROKEN,
     /** Regular control of the robot */
     DRIVE,
-    /** Slows the robot to sixty percent of its normal speed and uses the angle PID controller
-     * to face perpendicular to the Source. This takes away yaw control.
-    */
-    PICKUP,
     /** Uses the angle PID controller minimize the offset provided by aimingAngle.
-     * This takes away yaw control
+     * This takes away yaw control from the driver
      */
     AIMING,
     /** Removes all control and locks the wheels in an X formation */
