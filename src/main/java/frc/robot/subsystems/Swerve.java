@@ -75,6 +75,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
 
   private SwerveStates desiredState, currentState = SwerveStates.IDLE;
 
+  private double desiredHeading;
   private PIDController angleController = new PIDController(0.009, 0, 0);
 
   private DoubleSupplier aimingAngle;
@@ -223,7 +224,10 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
     // Convert the commanded speeds into the correct units for the drivetrain and scaling the speed
     double xSpeedDelivered = xSpeed * SwerveConstants.MAX_SPEED_METERS_PER_SECOND;
     double ySpeedDelivered = ySpeed * SwerveConstants.MAX_SPEED_METERS_PER_SECOND;
-    double rotDelivered = rot * SwerveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
+
+    // Changing the desired heading and use the angle PID controller 
+    desiredHeading += rot * SwerveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
+    double rotDelivered = angleController.calculate(getHeading(), desiredHeading);
 
     m_RobotChassisSpeeds = new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered);
 
@@ -270,7 +274,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
   }
 
   /**
-   * Sets the wheels into an || formation to prevent movement.
+   * Sets the wheels into an || formation.
    */
   public void setTank() {
     m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
@@ -318,6 +322,10 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
     m_gyro.setYaw(0);
+  }
+
+  public void setDesiredHeading(double heading) {
+    desiredHeading = heading;
   }
 
   /**
@@ -404,7 +412,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
           drive(
               -OI.getMappedJoysticks()[0],
               -OI.getMappedJoysticks()[1],
-              -OI.mappingFunction(OI.driverJoytick.getZ()),
+              -OI.mappingFunction(aimingAngle.getAsDouble()),
               true, SwerveConstants.SPEED_SCALE);
         }
         break;
@@ -475,7 +483,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
     /** Regular control of the robot */
     DRIVE,
     /** Uses the angle PID controller minimize the offset provided by aimingAngle.
-     * This takes away yaw control from the driver
+     * This takes away yaw control from the driver.
      */
     AIMING,
     /** Removes all control and locks the wheels in an X formation */
