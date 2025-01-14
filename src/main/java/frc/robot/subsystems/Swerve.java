@@ -217,10 +217,6 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
    *                      field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    // Convert XY to polar for rate limiting
-    // double inputTranslationDir = Math.atan2(ySpeed, xSpeed);
-    // double inputTranslationMag = Math.sqrt(Math.pow(xSpeed, 2) + Math.pow(ySpeed, 2));
-
     // Convert the commanded speeds into the correct units for the drivetrain and scaling the speed
     double xSpeedDelivered = xSpeed * SwerveConstants.MAX_SPEED_METERS_PER_SECOND;
     double ySpeedDelivered = ySpeed * SwerveConstants.MAX_SPEED_METERS_PER_SECOND;
