@@ -431,7 +431,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
   public void handleStateTransition() {
     switch(desiredState) {
       case IDLE:
-        drive(0,0,0,false);
+        stop();
         break;
       case BROKEN:
         stop();
