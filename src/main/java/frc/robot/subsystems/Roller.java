@@ -8,6 +8,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.CANConstants;
 
 // This is for the coral
 public class Roller extends SubsystemBase implements CheckableSubsystem, StateSubsystem {
@@ -21,7 +22,7 @@ public class Roller extends SubsystemBase implements CheckableSubsystem, StateSu
 
   /** Creates a new Rollers. */
   public Roller() {
-    motor = new SparkMax(999, MotorType.kBrushless);
+    motor = new SparkMax(CANConstants.ROLLER_ID, MotorType.kBrushless);
 
     initialized = true;
     status = true;
