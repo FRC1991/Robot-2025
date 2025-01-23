@@ -94,6 +94,7 @@ public abstract class Constants {
     public static final int BACK_LEFT_TURNING_ID = 8;
     public static final int BACK_RIGHT_TURNING_ID = 9;
 
+    // These are not CAN ids, these are the analog ports on the roborio
     public static final int FL_ENCODER_ANALOG_INPUT_CHANNEL = 0;
     public static final int FR_ENCODER_ANALOG_INPUT_CHANNEL = 1;
     public static final int BL_ENCODER_ANALOG_INPUT_CHANNEL = 2;
@@ -101,6 +102,13 @@ public abstract class Constants {
 
     // Gyro
     public static final int GYRO_ID = 10;
+
+    public static final int ROLLER_ID = 9990;
+    public static final int PIVOT_ID = 9991;
+    public static final int ALGAE_INTAKE_ID = 9992;
+    public static final int ELEVATOR_MOTOR_ONE_ID = 9993;
+    public static final int ELEVATOR_MOTOR_TWO_ID = 9994;
+    public static final int FLIPPER_ID = 9995;
   }
 
   public static abstract class OIConstants {
