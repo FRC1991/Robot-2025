@@ -43,7 +43,7 @@ public abstract class Constants {
     );
 
     // The speed modifier for the swerve drive as a percent
-    public static final double SPEED_SCALE = 0.4;
+    public static final double SPEED_SCALE = 0.01;
 
     // Chassis configuration
     public static final double TRACK_WIDTH = Units.inchesToMeters(99);
@@ -83,16 +83,16 @@ public abstract class Constants {
   // CAN IDs for every CAN device on the robot
   public static abstract class CANConstants {
     // Swerve driving motors
-    public static final int FRONT_LEFT_DRIVING_ID = 2;
-    public static final int FRONT_RIGHT_DRIVING_ID = 3;
-    public static final int BACK_LEFT_DRIVING_ID = 4;
-    public static final int BACK_RIGHT_DRIVING_ID = 5;
+    public static final int FRONT_LEFT_DRIVING_ID = 6;
+    public static final int FRONT_RIGHT_DRIVING_ID = 7;
+    public static final int BACK_LEFT_DRIVING_ID = 8;
+    public static final int BACK_RIGHT_DRIVING_ID = 9;
 
     // Swerve turning motors
-    public static final int FRONT_LEFT_TURNING_ID = 6;
-    public static final int FRONT_RIGHT_TURNING_ID = 7;
-    public static final int BACK_LEFT_TURNING_ID = 8;
-    public static final int BACK_RIGHT_TURNING_ID = 9;
+    public static final int FRONT_LEFT_TURNING_ID = 2;
+    public static final int FRONT_RIGHT_TURNING_ID = 3;
+    public static final int BACK_LEFT_TURNING_ID = 4;
+    public static final int BACK_RIGHT_TURNING_ID = 5;
 
     public static final int FL_ENCODER_ANALOG_INPUT_CHANNEL = 0;
     public static final int FR_ENCODER_ANALOG_INPUT_CHANNEL = 1;

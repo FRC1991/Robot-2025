@@ -75,7 +75,7 @@ public class SwerveModule implements CheckableSubsystem {
         .idleMode(IdleMode.kBrake)
         .smartCurrentLimit(40);
     turningConfig.closedLoop
-        .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+        .feedbackSensor(FeedbackSensor.kAnalogSensor)
         // These are example gains you may need to them for your own robot!
         .pid(0.01, 0, 0)
         .outputRange(-1, 1)
@@ -95,7 +95,7 @@ public class SwerveModule implements CheckableSubsystem {
         PersistMode.kPersistParameters);
 
     m_chassisAngularOffset = chassisAngularOffset;
-    m_desiredState.angle = new Rotation2d(m_turningEncoder.get());
+    m_desiredState.angle = new Rotation2d(m_turningEncoder.get() * 2 * Math.PI);
     driveMotor.setPosition(0);
 
     initialized = true;
@@ -111,7 +111,7 @@ public class SwerveModule implements CheckableSubsystem {
     // Apply chassis angular offset to the encoder position to get the position
     // relative to the chassis.
     return new SwerveModuleState(driveMotor.getVelocity().getValueAsDouble(),
-        new Rotation2d(m_turningEncoder.get() - m_chassisAngularOffset));
+        new Rotation2d((m_turningEncoder.get() * 2 * Math.PI) - m_chassisAngularOffset));
   }
 
   /**
@@ -125,7 +125,7 @@ public class SwerveModule implements CheckableSubsystem {
     // relative to the chassis.
     return new SwerveModulePosition(
         driveMotor.getPosition().getValueAsDouble(),
-        new Rotation2d(m_turningEncoder.get() - m_chassisAngularOffset));
+        new Rotation2d((m_turningEncoder.get() * 2 * Math.PI) - m_chassisAngularOffset));
   }
 
   /**
@@ -140,7 +140,7 @@ public class SwerveModule implements CheckableSubsystem {
     correctedDesiredState.angle = desiredState.angle.plus(Rotation2d.fromRadians(m_chassisAngularOffset));
 
     // Optimize the reference state to avoid spinning further than 90 degrees.
-    correctedDesiredState.optimize(new Rotation2d(m_turningEncoder.get()));
+    correctedDesiredState.optimize(new Rotation2d(m_turningEncoder.get() * 2 * Math.PI));
 
     // Command driving and turning motors towards their respective setpoints.
     driveMotor.setControl(new VelocityDutyCycle(correctedDesiredState.speedMetersPerSecond).withFeedForward(ModuleConstants.DRIVING_VELOCITY_FEED_FORWARD));

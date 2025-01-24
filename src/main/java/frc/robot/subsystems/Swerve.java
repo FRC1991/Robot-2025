@@ -419,9 +419,9 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
         break;
     }
 
-    if(!checkSubsystem()) {
-      setDesiredState(SwerveStates.BROKEN);
-    }
+    // if(!checkSubsystem()) {
+    //   setDesiredState(SwerveStates.BROKEN);
+    // }
   }
 
   /**
