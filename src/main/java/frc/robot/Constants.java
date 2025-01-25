@@ -94,10 +94,10 @@ public abstract class Constants {
     public static final int BACK_LEFT_TURNING_ID = 4;
     public static final int BACK_RIGHT_TURNING_ID = 5;
 
-    public static final int FL_ENCODER_ANALOG_INPUT_CHANNEL = 0;
-    public static final int FR_ENCODER_ANALOG_INPUT_CHANNEL = 1;
-    public static final int BL_ENCODER_ANALOG_INPUT_CHANNEL = 2;
-    public static final int BR_ENCODER_ANALOG_INPUT_CHANNEL = 3;
+    public static final int FL_ENCODER_ANALOG_INPUT_CHANNEL = 1;
+    public static final int FR_ENCODER_ANALOG_INPUT_CHANNEL = 2;
+    public static final int BL_ENCODER_ANALOG_INPUT_CHANNEL = 3;
+    public static final int BR_ENCODER_ANALOG_INPUT_CHANNEL = 0;
 
     // Gyro
     public static final int GYRO_ID = 10;
