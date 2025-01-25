@@ -4,10 +4,12 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.AnalogEncoder;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -23,6 +25,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import frc.robot.Constants.ModuleConstants;
+import frc.robot.Constants.SwerveConstants;
+import frc.utils.Utils;
 
 public class SwerveModule implements CheckableSubsystem {
   private boolean status = false;
@@ -38,6 +42,7 @@ public class SwerveModule implements CheckableSubsystem {
   private double m_chassisAngularOffset = 0;
   private SwerveModuleState m_desiredState = new SwerveModuleState(0.0, new Rotation2d());
 
+  private PIDController azimuth;
   /**
    * Constructs a SwerveModule and configures the driving and turning motor,
    * encoder, and PID controller. This robot uses the MK4 swerve modules
@@ -50,7 +55,13 @@ public class SwerveModule implements CheckableSubsystem {
     driveMotor = new TalonFX(drivingCANId);
     turningMotor = new SparkMax(turningCANId, MotorType.kBrushless);
 
+    azimuth = new PIDController(0.5, 0, 0);
+    azimuth.enableContinuousInput(0, 1);
+    azimuth.setTolerance(0.05);
+
     m_turningEncoder = new AnalogEncoder(encoderChannel);
+
+    Shuffleboard.getTab("Main").addDouble("encoder" + encoderChannel, m_turningEncoder::get);
 
     m_turningClosedLoopController = turningMotor.getClosedLoopController();
 
@@ -74,17 +85,17 @@ public class SwerveModule implements CheckableSubsystem {
     turningConfig
         .idleMode(IdleMode.kBrake)
         .smartCurrentLimit(40);
-    turningConfig.closedLoop
-        .feedbackSensor(FeedbackSensor.kAnalogSensor)
-        // These are example gains you may need to them for your own robot!
-        .pid(0.01, 0, 0)
-        .outputRange(-1, 1)
-        // Enable PID wrap around for the turning motor. This will allow the PID
-        // controller to go through 0 to get to the setpoint i.e. going from 350 degrees
-        // to 10 degrees will go through 0 rather than the other direction which is a
-        // longer route.
-        .positionWrappingEnabled(true)
-        .positionWrappingInputRange(0, turningFactor);
+    // turningConfig.closedLoop
+    //     .feedbackSensor(FeedbackSensor.kAnalogSensor)
+    //     // These are example gains you may need to them for your own robot!
+    //     .pid(0.01, 0, 0)
+    //     .outputRange(-1, 1)
+    //     // Enable PID wrap around for the turning motor. This will allow the PID
+    //     // controller to go through 0 to get to the setpoint i.e. going from 350 degrees
+    //     // to 10 degrees will go through 0 rather than the other direction which is a
+    //     // longer route.
+    //     .positionWrappingEnabled(true)
+    //     .positionWrappingInputRange(0, turningFactor);
 
     // Apply the configuration to the motor, so it is always in
     // a consistent state regardless of what has happened to the
@@ -143,8 +154,10 @@ public class SwerveModule implements CheckableSubsystem {
     correctedDesiredState.optimize(new Rotation2d(m_turningEncoder.get() * 2 * Math.PI));
 
     // Command driving and turning motors towards their respective setpoints.
-    driveMotor.setControl(new VelocityDutyCycle(correctedDesiredState.speedMetersPerSecond).withFeedForward(ModuleConstants.DRIVING_VELOCITY_FEED_FORWARD));
-    m_turningClosedLoopController.setReference(correctedDesiredState.angle.getRadians(), SparkMax.ControlType.kPosition);
+    driveMotor.set(Utils.normalize(correctedDesiredState.speedMetersPerSecond / SwerveConstants.MAX_SPEED_METERS_PER_SECOND));
+    azimuth.setSetpoint(correctedDesiredState.angle.getDegrees() / 360);
+
+    turningMotor.set(azimuth.calculate(m_turningEncoder.get()));
 
     m_desiredState = desiredState;
   }

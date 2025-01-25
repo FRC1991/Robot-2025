@@ -10,8 +10,11 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.subsystems.Manager;
+import frc.robot.subsystems.Manager.ManagerStates;
 
 public class RobotContainer {
 
@@ -38,6 +41,11 @@ public class RobotContainer {
 
   private void configureBindings() {
     m_Manager.setDefaultCommand(new RunCommand(() -> m_Manager.update(), m_Manager));
+
+    // Stops movement - Works
+    new JoystickButton(OI.driverJoytick, 1)
+        .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.LOCKED), m_Manager))
+        .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
   }
 
   public Command getAutonomousCommand() {

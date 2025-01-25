@@ -223,7 +223,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
 
     // Changing the desired heading and use the angle PID controller 
     desiredHeading += rot * SwerveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
-    double rotDelivered = angleController.calculate(getHeading(), desiredHeading);
+    double rotDelivered = desiredHeading;
 
     m_RobotChassisSpeeds = new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered);
 
@@ -231,13 +231,8 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
         fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(getHeading()))
             : m_RobotChassisSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(
-        swerveModuleStates, SwerveConstants.MAX_SPEED_METERS_PER_SECOND);
-
-    m_frontLeft.setDesiredState(swerveModuleStates[0]);
-    m_frontRight.setDesiredState(swerveModuleStates[1]);
-    m_rearLeft.setDesiredState(swerveModuleStates[2]);
-    m_rearRight.setDesiredState(swerveModuleStates[3]);
+    
+    setModuleStates(swerveModuleStates);
   }
 
   /**
@@ -397,10 +392,10 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
       case DRIVE:
         if(DriverStation.isTeleopEnabled()) {
           drive(
-              -OI.getMappedJoysticks()[0],
-              -OI.getMappedJoysticks()[1],
-              -OI.mappingFunction(OI.driverJoytick.getZ()),
-              true, SwerveConstants.SPEED_SCALE);
+              OI.driverJoytick.getY(),
+              OI.driverJoytick.getX(),
+              OI.driverJoytick.getZ(),
+              false, SwerveConstants.SPEED_SCALE);
         }
         break;
       case AIMING:
