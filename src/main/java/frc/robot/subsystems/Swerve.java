@@ -75,7 +75,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
 
   private SwerveStates desiredState, currentState = SwerveStates.IDLE;
 
-  private double desiredHeading;
+  // private double desiredHeading;
   private PIDController angleController = new PIDController(0.009, 0, 0);
 
   private DoubleSupplier aimingAngle;
@@ -222,8 +222,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
     double ySpeedDelivered = ySpeed * SwerveConstants.MAX_SPEED_METERS_PER_SECOND;
 
     // Changing the desired heading and use the angle PID controller 
-    desiredHeading += rot * SwerveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
-    double rotDelivered = desiredHeading;
+    double rotDelivered = rot * SwerveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
 
     m_RobotChassisSpeeds = new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered);
 
@@ -315,9 +314,9 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
     m_gyro.setYaw(0);
   }
 
-  public void setDesiredHeading(double heading) {
-    desiredHeading = heading;
-  }
+  // public void setDesiredHeading(double heading) {
+  //   desiredHeading = heading;
+  // }
 
   /**
    * Returns the heading of the robot.
@@ -392,9 +391,9 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
       case DRIVE:
         if(DriverStation.isTeleopEnabled()) {
           drive(
-              OI.driverJoytick.getY(),
-              OI.driverJoytick.getX(),
-              OI.driverJoytick.getZ(),
+              MathUtil.applyDeadband(OI.driverJoytick.getY(), 0.05),
+              MathUtil.applyDeadband(OI.driverJoytick.getX(), 0.05),
+              MathUtil.applyDeadband(OI.driverJoytick.getZ(), 0.05),
               false, SwerveConstants.SPEED_SCALE);
         }
         break;
