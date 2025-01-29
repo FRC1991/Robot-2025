@@ -46,9 +46,9 @@ public abstract class Constants {
     public static final double SPEED_SCALE = 0.2;
 
     // Chassis configuration
-    public static final double TRACK_WIDTH = Units.inchesToMeters(99);
+    public static final double TRACK_WIDTH = Units.inchesToMeters(22.5);
     // Distance between centers of right and left wheels on robot
-    public static final double WHEEL_BASE = Units.inchesToMeters(99);
+    public static final double WHEEL_BASE = Units.inchesToMeters(22.5);
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics DRIVE_KINEMATICS = new SwerveDriveKinematics(
         new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
@@ -57,8 +57,8 @@ public abstract class Constants {
         new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2));
 
     // Angular offsets of the modules relative to the chassis in radians
-    public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = 0;
-    public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = -Math.PI / 2;
+    public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = -Math.PI / 2;
+    public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = 0;
     public static final double BACK_LEFT_CHASSIS_ANGULAR_OFFSET = Math.PI;
     public static final double BACK_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.PI / 2;
 

@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -55,13 +56,13 @@ public class SwerveModule implements CheckableSubsystem {
     driveMotor = new TalonFX(drivingCANId);
     turningMotor = new SparkMax(turningCANId, MotorType.kBrushless);
 
-    azimuth = new PIDController(0.3, 0, 0);
-    azimuth.enableContinuousInput(0, 1);
-    azimuth.setTolerance(0.02);
+    azimuth = new PIDController(0.008, 0, 0);
+    azimuth.enableContinuousInput(-180, 180);
+    azimuth.setTolerance(2);
 
     m_turningEncoder = new AnalogEncoder(encoderChannel);
 
-    Shuffleboard.getTab("Main").addDouble("encoder" + encoderChannel, m_turningEncoder::get);
+    Shuffleboard.getTab("Main").addDouble("encoder" + encoderChannel, this::getEncoderDegrees);
     Shuffleboard.getTab("Main").addDouble("Velocity" + encoderChannel, () -> m_desiredState.speedMetersPerSecond);
     Shuffleboard.getTab("Main").addDouble("Angle" + encoderChannel, () -> m_desiredState.angle.getDegrees());
 
@@ -108,7 +109,7 @@ public class SwerveModule implements CheckableSubsystem {
         PersistMode.kPersistParameters);
 
     m_chassisAngularOffset = chassisAngularOffset;
-    m_desiredState.angle = new Rotation2d(m_turningEncoder.get() * 2 * Math.PI);
+    m_desiredState.angle = new Rotation2d(getEncoderRadians());
     driveMotor.setPosition(0);
 
     initialized = true;
@@ -128,6 +129,22 @@ public class SwerveModule implements CheckableSubsystem {
   }
 
   /**
+   * Returns angle in degrees [-180, 180]
+   * @return Current angle of the module
+   */
+  public double getEncoderDegrees() {
+    return (m_turningEncoder.get() * 360) - 180;
+  }
+
+  /**
+   * Returns angle in radians 0-2pi
+   * @return Current angle of the module
+   */
+  public double getEncoderRadians() {
+    return (m_turningEncoder.get() * 2 * Math.PI) - Math.PI;
+  }
+
+  /**
    * Returns the current position of the module.
    *
    * @return The current position of the module.
@@ -138,7 +155,7 @@ public class SwerveModule implements CheckableSubsystem {
     // relative to the chassis.
     return new SwerveModulePosition(
         driveMotor.getPosition().getValueAsDouble(),
-        new Rotation2d((m_turningEncoder.get() * 2 * Math.PI) - m_chassisAngularOffset));
+        new Rotation2d((getEncoderRadians()) - m_chassisAngularOffset));
   }
 
   /**
@@ -150,20 +167,23 @@ public class SwerveModule implements CheckableSubsystem {
     // Apply chassis angular offset to the desired state.
     SwerveModuleState correctedDesiredState = new SwerveModuleState();
     correctedDesiredState.speedMetersPerSecond = desiredState.speedMetersPerSecond;
-    // correctedDesiredState.angle = desiredState.angle.plus(Rotation2d.fromRadians(m_chassisAngularOffset));
-    correctedDesiredState.angle = desiredState.angle;
+    correctedDesiredState.angle = desiredState.angle.plus(Rotation2d.fromRadians(m_chassisAngularOffset));
 
     // Optimize the reference state to avoid spinning further than 90 degrees.
-    correctedDesiredState.optimize(new Rotation2d(m_turningEncoder.get() * 2 * Math.PI));
+    correctedDesiredState.optimize(new Rotation2d(getEncoderRadians()));
 
-    if(correctedDesiredState.compareTo(new SwerveModuleState(0.02, new Rotation2d(0))) == -1) {
-      return;
-    }
     // Command driving and turning motors towards their respective setpoints.
     driveMotor.set(Utils.normalize(correctedDesiredState.speedMetersPerSecond / SwerveConstants.MAX_SPEED_METERS_PER_SECOND));
-    azimuth.setSetpoint((correctedDesiredState.angle.getDegrees()+180) / 360);
+    
+    // azimuth.setSetpoint(correctedDesiredState.angle.getDegrees());
+    
+    double error = azimuth.calculate(getEncoderDegrees(), correctedDesiredState.angle.getDegrees());
 
-    turningMotor.set(azimuth.calculate(m_turningEncoder.get()));
+    if(Math.abs(error) < 0.05) {
+      error = 0;
+    }
+
+    turningMotor.set(Utils.normalize(error));
 
     m_desiredState = correctedDesiredState;
   }

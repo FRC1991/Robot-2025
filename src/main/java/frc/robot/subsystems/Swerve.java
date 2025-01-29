@@ -21,6 +21,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import frc.robot.Constants.CANConstants;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.OI;
@@ -82,6 +83,9 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
 
   // Constructor is private to prevent multiple instances from being made
   private Swerve() {
+
+    Shuffleboard.getTab("Main").add("Gyro", m_gyro.getYaw().getValueAsDouble());
+
     angleController.setTolerance(1);
     angleController.enableContinuousInput(0, 360);
 
@@ -220,16 +224,12 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
     // Convert the commanded speeds into the correct units for the drivetrain and scaling the speed
     double xSpeedDelivered = xSpeed * SwerveConstants.MAX_SPEED_METERS_PER_SECOND;
     double ySpeedDelivered = ySpeed * SwerveConstants.MAX_SPEED_METERS_PER_SECOND;
-
-    // Changing the desired heading and use the angle PID controller 
     double rotDelivered = rot * SwerveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
-
-    m_RobotChassisSpeeds = new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered);
 
     var swerveModuleStates = SwerveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
         fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(getHeading()))
-            : m_RobotChassisSpeeds);
+            : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
     
     setModuleStates(swerveModuleStates);
   }
@@ -324,7 +324,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
    * @return the robot's heading in degrees, from [0, 360)
    */
   public double getHeading() {
-    return MathUtil.inputModulus(m_gyro.getRotation2d().getDegrees(), 0, 360);
+    return MathUtil.inputModulus(m_gyro.getYaw().getValueAsDouble(), 0, 360);
   }
 
   /**
@@ -407,6 +407,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
         }
         break;
       case LOCKED:
+        setX();
         break;
 
       default:
