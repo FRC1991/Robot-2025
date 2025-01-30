@@ -57,10 +57,10 @@ public abstract class Constants {
         new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2));
 
     // Angular offsets of the modules relative to the chassis in radians
-    public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = -Math.PI / 2;
-    public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = 0;
-    public static final double BACK_LEFT_CHASSIS_ANGULAR_OFFSET = Math.PI;
-    public static final double BACK_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.PI / 2;
+    public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = -(Math.PI / 2) - (Math.PI / 6) - 0.226;
+    public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.PI + 0.226;
+    public static final double BACK_LEFT_CHASSIS_ANGULAR_OFFSET = 0 - 0.226; // GOOD
+    public static final double BACK_RIGHT_CHASSIS_ANGULAR_OFFSET = -(Math.PI / 2) + 0.226;
 
     public static final boolean GYRO_REVERSED = false;
 
@@ -85,19 +85,19 @@ public abstract class Constants {
     // Swerve driving motors
     public static final int FRONT_LEFT_DRIVING_ID = 6;
     public static final int FRONT_RIGHT_DRIVING_ID = 7;
-    public static final int BACK_LEFT_DRIVING_ID = 8;
-    public static final int BACK_RIGHT_DRIVING_ID = 9;
+    public static final int BACK_LEFT_DRIVING_ID = 9;
+    public static final int BACK_RIGHT_DRIVING_ID = 8;
 
     // Swerve turning motors
     public static final int FRONT_LEFT_TURNING_ID = 2;
     public static final int FRONT_RIGHT_TURNING_ID = 3;
-    public static final int BACK_LEFT_TURNING_ID = 4;
-    public static final int BACK_RIGHT_TURNING_ID = 5;
+    public static final int BACK_LEFT_TURNING_ID = 5;
+    public static final int BACK_RIGHT_TURNING_ID = 4;
 
     public static final int FL_ENCODER_ANALOG_INPUT_CHANNEL = 1;
     public static final int FR_ENCODER_ANALOG_INPUT_CHANNEL = 2;
-    public static final int BL_ENCODER_ANALOG_INPUT_CHANNEL = 3;
-    public static final int BR_ENCODER_ANALOG_INPUT_CHANNEL = 0;
+    public static final int BL_ENCODER_ANALOG_INPUT_CHANNEL = 0;
+    public static final int BR_ENCODER_ANALOG_INPUT_CHANNEL = 3;
 
     // Gyro
     public static final int GYRO_ID = 10;

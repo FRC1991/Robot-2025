@@ -58,7 +58,7 @@ public class SwerveModule implements CheckableSubsystem {
 
     azimuth = new PIDController(0.008, 0, 0);
     azimuth.enableContinuousInput(-180, 180);
-    azimuth.setTolerance(2);
+    azimuth.setTolerance(1);
 
     m_turningEncoder = new AnalogEncoder(encoderChannel);
 
@@ -133,15 +133,15 @@ public class SwerveModule implements CheckableSubsystem {
    * @return Current angle of the module
    */
   public double getEncoderDegrees() {
-    return (m_turningEncoder.get() * 360) - 180;
+    return getEncoderRadians() * (180 / Math.PI);
   }
 
   /**
-   * Returns angle in radians 0-2pi
+   * Returns angle in radians [-PI, PI]
    * @return Current angle of the module
    */
   public double getEncoderRadians() {
-    return (m_turningEncoder.get() * 2 * Math.PI) - Math.PI;
+    return MathUtil.angleModulus(m_turningEncoder.get() * 2 * Math.PI + m_chassisAngularOffset);
   }
 
   /**
@@ -167,7 +167,7 @@ public class SwerveModule implements CheckableSubsystem {
     // Apply chassis angular offset to the desired state.
     SwerveModuleState correctedDesiredState = new SwerveModuleState();
     correctedDesiredState.speedMetersPerSecond = desiredState.speedMetersPerSecond;
-    correctedDesiredState.angle = desiredState.angle.plus(Rotation2d.fromRadians(m_chassisAngularOffset));
+    correctedDesiredState.angle = desiredState.angle;
 
     // Optimize the reference state to avoid spinning further than 90 degrees.
     correctedDesiredState.optimize(new Rotation2d(getEncoderRadians()));
@@ -179,7 +179,7 @@ public class SwerveModule implements CheckableSubsystem {
     
     double error = azimuth.calculate(getEncoderDegrees(), correctedDesiredState.angle.getDegrees());
 
-    if(Math.abs(error) < 0.05) {
+    if(Math.abs(error) < 0.02) {
       error = 0;
     }
 

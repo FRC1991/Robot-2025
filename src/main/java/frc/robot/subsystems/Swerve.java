@@ -264,13 +264,13 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
   }
 
   /**
-   * Sets the wheels into an || formation.
+   * Sets the wheels to their zero.
    */
   public void setTank() {
     m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
     m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
-    m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(180)));
-    m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(1800)));
+    m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
+    m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
   }
 
   /**
@@ -394,7 +394,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
               MathUtil.applyDeadband(OI.driverJoytick.getY(), 0.05),
               MathUtil.applyDeadband(OI.driverJoytick.getX(), 0.05),
               MathUtil.applyDeadband(OI.driverJoytick.getZ(), 0.05),
-              false, SwerveConstants.SPEED_SCALE);
+              true, SwerveConstants.SPEED_SCALE);
         }
         break;
       case AIMING:
