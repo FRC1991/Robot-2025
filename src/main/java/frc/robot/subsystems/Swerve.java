@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import frc.robot.Constants.CANConstants;
 import frc.robot.Constants.SwerveConstants;
+import frc.utils.Utils;
 import frc.robot.OI;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -77,7 +78,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
   private SwerveStates desiredState, currentState = SwerveStates.IDLE;
 
   private double desiredHeading;
-  private PIDController angleController = new PIDController(0.009, 0, 0);
+  private PIDController angleController = new PIDController(0.001, 0, 0);
   private boolean activelyTurning;
 
   private DoubleSupplier aimingAngle;
@@ -85,7 +86,8 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
   // Constructor is private to prevent multiple instances from being made
   private Swerve() {
 
-    Shuffleboard.getTab("Main").add("Gyro", m_gyro.getYaw().getValueAsDouble());
+    Shuffleboard.getTab("Main").addDouble("Heading", this::getHeading);
+    Shuffleboard.getTab("Main").addBoolean("Actively turning", () -> activelyTurning);
 
     angleController.setTolerance(1);
     angleController.enableContinuousInput(0, 360);
@@ -116,6 +118,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
     );
 
     zeroHeading();
+    desiredHeading = 0;
   }
 
   /**
@@ -227,13 +230,12 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
     double ySpeedDelivered = ySpeed * SwerveConstants.MAX_SPEED_METERS_PER_SECOND;
 
     if(activelyTurning) {
-      desiredHeading = desiredHeading + (rot * 2);
-    } else {
-      desiredHeading = getHeading() + (rot * 2);
-    }
-    
+      desiredHeading = desiredHeading + (rot * SwerveConstants.MAX_DEGREES_PER_SCHEDULER_LOOP);
+    } else if(rot != 0) {
+      desiredHeading = getHeading() + (rot * SwerveConstants.MAX_DEGREES_PER_SCHEDULER_LOOP);
+    } else {}
 
-    double rotDelivered = angleController.calculate(getHeading(), desiredHeading) * SwerveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
+    double rotDelivered = Utils.normalize(angleController.calculate(getHeading(), desiredHeading)) * SwerveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
 
     var swerveModuleStates = SwerveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
         fieldRelative
