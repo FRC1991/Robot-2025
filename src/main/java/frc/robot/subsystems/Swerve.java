@@ -20,8 +20,11 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.CANConstants;
 import frc.robot.Constants.SwerveConstants;
 import frc.utils.Utils;
@@ -78,7 +81,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
   private SwerveStates desiredState, currentState = SwerveStates.IDLE;
 
   private double desiredHeading;
-  private PIDController angleController = new PIDController(0.001, 0, 0);
+  private PIDController angleController = new PIDController(0.01, 0, 0);
   private boolean activelyTurning;
 
   private DoubleSupplier aimingAngle;
@@ -88,8 +91,17 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
 
     Shuffleboard.getTab("Main").addDouble("Heading", this::getHeading);
     Shuffleboard.getTab("Main").addBoolean("Actively turning", () -> activelyTurning);
+    Shuffleboard.getTab("Main").addDouble("Desired heading", () -> desiredHeading);
 
-    angleController.setTolerance(1);
+    SmartDashboard.putData("Heading", new Sendable() {
+        @Override
+        public void initSendable(SendableBuilder builder) {
+          builder.addDoubleProperty("Heading", () -> getHeading(), p -> setDesiredHeading(p));
+        }
+      }
+    );
+    
+    angleController.setTolerance(2);
     angleController.enableContinuousInput(0, 360);
 
     // Configure AutoBuilder last
@@ -229,13 +241,17 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
     double xSpeedDelivered = xSpeed * SwerveConstants.MAX_SPEED_METERS_PER_SECOND;
     double ySpeedDelivered = ySpeed * SwerveConstants.MAX_SPEED_METERS_PER_SECOND;
 
+    // rot *= SwerveConstants.GYRO_REVERSED ? -1 : 1;
+    
     if(activelyTurning) {
       desiredHeading = desiredHeading + (rot * SwerveConstants.MAX_DEGREES_PER_SCHEDULER_LOOP);
     } else if(rot != 0) {
       desiredHeading = getHeading() + (rot * SwerveConstants.MAX_DEGREES_PER_SCHEDULER_LOOP);
     } else {}
 
-    double rotDelivered = Utils.normalize(angleController.calculate(getHeading(), desiredHeading)) * SwerveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
+    desiredHeading = MathUtil.inputModulus(desiredHeading, 0, 360);
+
+    double rotDelivered = Utils.normalize(angleController.calculate(getHeading(), desiredHeading)) * SwerveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND * -1;
 
     var swerveModuleStates = SwerveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
         fieldRelative

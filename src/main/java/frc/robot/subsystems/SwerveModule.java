@@ -57,9 +57,9 @@ public class SwerveModule implements CheckableSubsystem {
 
     m_turningEncoder = new AnalogEncoder(encoderChannel);
 
-    Shuffleboard.getTab("Main").addDouble("encoder" + encoderChannel, this::getEncoderDegrees);
-    Shuffleboard.getTab("Main").addDouble("Velocity" + encoderChannel, () -> m_desiredState.speedMetersPerSecond);
-    Shuffleboard.getTab("Main").addDouble("Angle" + encoderChannel, () -> m_desiredState.angle.getDegrees());
+    // Shuffleboard.getTab("Main").addDouble("encoder" + encoderChannel, this::getEncoderDegrees);
+    // Shuffleboard.getTab("Main").addDouble("Velocity" + encoderChannel, () -> m_desiredState.speedMetersPerSecond);
+    // Shuffleboard.getTab("Main").addDouble("Angle" + encoderChannel, () -> m_desiredState.angle.getDegrees());
 
     TalonFXConfiguration driveTalonConfig = new TalonFXConfiguration();
     SparkMaxConfig turningConfig = new SparkMaxConfig();

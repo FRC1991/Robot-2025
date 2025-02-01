@@ -62,7 +62,7 @@ public abstract class Constants {
     public static final double BACK_LEFT_CHASSIS_ANGULAR_OFFSET = 0 - 0.226; // GOOD
     public static final double BACK_RIGHT_CHASSIS_ANGULAR_OFFSET = -(Math.PI / 2) + 0.226;
 
-    public static final boolean GYRO_REVERSED = false;
+    public static final boolean GYRO_REVERSED = true;
 
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
