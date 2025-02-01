@@ -81,6 +81,8 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
 
   private DoubleSupplier aimingAngle;
 
+  private double desiredHeading;
+
   // Constructor is private to prevent multiple instances from being made
   private Swerve() {
 
@@ -224,7 +226,10 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
     // Convert the commanded speeds into the correct units for the drivetrain and scaling the speed
     double xSpeedDelivered = xSpeed * SwerveConstants.MAX_SPEED_METERS_PER_SECOND;
     double ySpeedDelivered = ySpeed * SwerveConstants.MAX_SPEED_METERS_PER_SECOND;
-    double rotDelivered = rot * SwerveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
+
+    desiredHeading += rot * 2;
+
+    double rotDelivered = angleController.calculate(getHeading(), desiredHeading) * SwerveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
 
     var swerveModuleStates = SwerveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
         fieldRelative
@@ -314,9 +319,9 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
     m_gyro.setYaw(0);
   }
 
-  // public void setDesiredHeading(double heading) {
-  //   desiredHeading = heading;
-  // }
+  public void setDesiredHeading(double heading) {
+    desiredHeading = heading;
+  }
 
   /**
    * Returns the heading of the robot.

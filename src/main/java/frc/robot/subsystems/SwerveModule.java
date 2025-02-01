@@ -14,14 +14,11 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkClosedLoopController;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -37,8 +34,6 @@ public class SwerveModule implements CheckableSubsystem {
   private final SparkMax turningMotor;
 
   private final AnalogEncoder m_turningEncoder;
-
-  private final SparkClosedLoopController m_turningClosedLoopController;
 
   private double m_chassisAngularOffset = 0;
   private SwerveModuleState m_desiredState = new SwerveModuleState(0.0, new Rotation2d());
@@ -66,14 +61,11 @@ public class SwerveModule implements CheckableSubsystem {
     Shuffleboard.getTab("Main").addDouble("Velocity" + encoderChannel, () -> m_desiredState.speedMetersPerSecond);
     Shuffleboard.getTab("Main").addDouble("Angle" + encoderChannel, () -> m_desiredState.angle.getDegrees());
 
-    m_turningClosedLoopController = turningMotor.getClosedLoopController();
-
     TalonFXConfiguration driveTalonConfig = new TalonFXConfiguration();
     SparkMaxConfig turningConfig = new SparkMaxConfig();
 
     // Use module constants to calculate conversion factors and feed forward gain.
     double drivingFactor = ModuleConstants.WHEEL_DIAMETER_METERS * Math.PI / ModuleConstants.DRIVING_MOTOR_REDUCTION;
-    double turningFactor = 2 * Math.PI;
 
     driveTalonConfig.TorqueCurrent.PeakForwardTorqueCurrent = 80.0;
     driveTalonConfig.TorqueCurrent.PeakReverseTorqueCurrent = -80.0;

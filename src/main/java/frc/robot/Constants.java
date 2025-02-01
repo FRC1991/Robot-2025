@@ -43,7 +43,7 @@ public abstract class Constants {
     );
 
     // The speed modifier for the swerve drive as a percent
-    public static final double SPEED_SCALE = 0.2;
+    public static final double SPEED_SCALE = 1;
 
     // Chassis configuration
     public static final double TRACK_WIDTH = Units.inchesToMeters(22.5);
