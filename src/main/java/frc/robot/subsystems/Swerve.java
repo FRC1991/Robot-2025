@@ -76,12 +76,11 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
 
   private SwerveStates desiredState, currentState = SwerveStates.IDLE;
 
-  // private double desiredHeading;
+  private double desiredHeading;
   private PIDController angleController = new PIDController(0.009, 0, 0);
+  private boolean activelyTurning;
 
   private DoubleSupplier aimingAngle;
-
-  private double desiredHeading;
 
   // Constructor is private to prevent multiple instances from being made
   private Swerve() {
@@ -227,7 +226,12 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
     double xSpeedDelivered = xSpeed * SwerveConstants.MAX_SPEED_METERS_PER_SECOND;
     double ySpeedDelivered = ySpeed * SwerveConstants.MAX_SPEED_METERS_PER_SECOND;
 
-    desiredHeading += rot * 2;
+    if(activelyTurning) {
+      desiredHeading = desiredHeading + (rot * 2);
+    } else {
+      desiredHeading = getHeading() + (rot * 2);
+    }
+    
 
     double rotDelivered = angleController.calculate(getHeading(), desiredHeading) * SwerveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
 
@@ -236,6 +240,8 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(getHeading()))
             : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
     
+    activelyTurning = rot != 0 ? true : false;
+
     setModuleStates(swerveModuleStates);
   }
 
