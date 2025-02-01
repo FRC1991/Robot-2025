@@ -46,6 +46,9 @@ public class RobotContainer {
     new JoystickButton(OI.driverJoytick, 1)
         .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.LOCKED), m_Manager))
         .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
+    
+    new JoystickButton(OI.driverJoytick, 2)
+        .onTrue(new InstantCommand(() -> m_Manager.swerve.zeroHeading(), m_Manager));
   }
 
   public Command getAutonomousCommand() {
