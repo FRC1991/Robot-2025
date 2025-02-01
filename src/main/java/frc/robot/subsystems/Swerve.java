@@ -21,8 +21,10 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import frc.robot.Constants.CANConstants;
 import frc.robot.Constants.SwerveConstants;
+import frc.utils.Utils;
 import frc.robot.OI;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -76,12 +78,17 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
   private SwerveStates desiredState, currentState = SwerveStates.IDLE;
 
   private double desiredHeading;
-  private PIDController angleController = new PIDController(0.009, 0, 0);
+  private PIDController angleController = new PIDController(0.001, 0, 0);
+  private boolean activelyTurning;
 
   private DoubleSupplier aimingAngle;
 
   // Constructor is private to prevent multiple instances from being made
   private Swerve() {
+
+    Shuffleboard.getTab("Main").addDouble("Heading", this::getHeading);
+    Shuffleboard.getTab("Main").addBoolean("Actively turning", () -> activelyTurning);
+
     angleController.setTolerance(1);
     angleController.enableContinuousInput(0, 360);
 
@@ -111,6 +118,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
     );
 
     zeroHeading();
+    desiredHeading = 0;
   }
 
   /**
@@ -221,23 +229,22 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
     double xSpeedDelivered = xSpeed * SwerveConstants.MAX_SPEED_METERS_PER_SECOND;
     double ySpeedDelivered = ySpeed * SwerveConstants.MAX_SPEED_METERS_PER_SECOND;
 
-    // Changing the desired heading and use the angle PID controller 
-    desiredHeading += rot * SwerveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
-    double rotDelivered = angleController.calculate(getHeading(), desiredHeading);
+    if(activelyTurning) {
+      desiredHeading = desiredHeading + (rot * SwerveConstants.MAX_DEGREES_PER_SCHEDULER_LOOP);
+    } else if(rot != 0) {
+      desiredHeading = getHeading() + (rot * SwerveConstants.MAX_DEGREES_PER_SCHEDULER_LOOP);
+    } else {}
 
-    m_RobotChassisSpeeds = new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered);
+    double rotDelivered = Utils.normalize(angleController.calculate(getHeading(), desiredHeading)) * SwerveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
 
     var swerveModuleStates = SwerveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
         fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(getHeading()))
-            : m_RobotChassisSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(
-        swerveModuleStates, SwerveConstants.MAX_SPEED_METERS_PER_SECOND);
+            : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
+    
+    activelyTurning = rot != 0 ? true : false;
 
-    m_frontLeft.setDesiredState(swerveModuleStates[0]);
-    m_frontRight.setDesiredState(swerveModuleStates[1]);
-    m_rearLeft.setDesiredState(swerveModuleStates[2]);
-    m_rearRight.setDesiredState(swerveModuleStates[3]);
+    setModuleStates(swerveModuleStates);
   }
 
   /**
@@ -270,13 +277,13 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
   }
 
   /**
-   * Sets the wheels into an || formation.
+   * Sets the wheels to their zero.
    */
   public void setTank() {
     m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
     m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
-    m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(180)));
-    m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(1800)));
+    m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
+    m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
   }
 
   /**
@@ -330,7 +337,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
    * @return the robot's heading in degrees, from [0, 360)
    */
   public double getHeading() {
-    return MathUtil.inputModulus(m_gyro.getRotation2d().getDegrees(), 0, 360);
+    return MathUtil.inputModulus(m_gyro.getYaw().getValueAsDouble(), 0, 360);
   }
 
   /**
@@ -397,9 +404,9 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
       case DRIVE:
         if(DriverStation.isTeleopEnabled()) {
           drive(
-              -OI.getMappedJoysticks()[0],
-              -OI.getMappedJoysticks()[1],
-              -OI.mappingFunction(OI.driverJoytick.getZ()),
+              MathUtil.applyDeadband(OI.driverJoytick.getY(), 0.05),
+              MathUtil.applyDeadband(OI.driverJoytick.getX(), 0.05),
+              MathUtil.applyDeadband(OI.driverJoytick.getZ(), 0.05),
               true, SwerveConstants.SPEED_SCALE);
         }
         break;
@@ -413,15 +420,16 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
         }
         break;
       case LOCKED:
+        setX();
         break;
 
       default:
         break;
     }
 
-    if(!checkSubsystem()) {
-      setDesiredState(SwerveStates.BROKEN);
-    }
+    // if(!checkSubsystem()) {
+    //   setDesiredState(SwerveStates.BROKEN);
+    // }
   }
 
   /**

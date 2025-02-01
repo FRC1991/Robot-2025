@@ -43,12 +43,12 @@ public abstract class Constants {
     );
 
     // The speed modifier for the swerve drive as a percent
-    public static final double SPEED_SCALE = 0.4;
+    public static final double SPEED_SCALE = 0.2;
 
     // Chassis configuration
-    public static final double TRACK_WIDTH = Units.inchesToMeters(99);
+    public static final double TRACK_WIDTH = Units.inchesToMeters(22.5);
     // Distance between centers of right and left wheels on robot
-    public static final double WHEEL_BASE = Units.inchesToMeters(99);
+    public static final double WHEEL_BASE = Units.inchesToMeters(22.5);
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics DRIVE_KINEMATICS = new SwerveDriveKinematics(
         new Translation2d(WHEEL_BASE / 2, TRACK_WIDTH / 2),
@@ -57,10 +57,10 @@ public abstract class Constants {
         new Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2));
 
     // Angular offsets of the modules relative to the chassis in radians
-    public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = -Math.PI / 2;
-    public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = 0;
-    public static final double BACK_LEFT_CHASSIS_ANGULAR_OFFSET = Math.PI;
-    public static final double BACK_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.PI / 2;
+    public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = -(Math.PI / 2) - (Math.PI / 6) - 0.226;
+    public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.PI + 0.226;
+    public static final double BACK_LEFT_CHASSIS_ANGULAR_OFFSET = 0 - 0.226; // GOOD
+    public static final double BACK_RIGHT_CHASSIS_ANGULAR_OFFSET = -(Math.PI / 2) + 0.226;
 
     public static final boolean GYRO_REVERSED = false;
 
@@ -68,6 +68,7 @@ public abstract class Constants {
     // the robot, rather the allowed maximum speeds
     public static final double MAX_SPEED_METERS_PER_SECOND = 4.8;
     public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2 * Math.PI; // radians per second
+    public static final double MAX_DEGREES_PER_SCHEDULER_LOOP = MAX_ANGULAR_SPEED_RADIANS_PER_SECOND * (180/Math.PI) / 1000 * 20;
   }
 
   public static abstract class ModuleConstants {
@@ -83,21 +84,20 @@ public abstract class Constants {
   // CAN IDs for every CAN device on the robot
   public static abstract class CANConstants {
     // Swerve driving motors
-    public static final int FRONT_LEFT_DRIVING_ID = 2;
-    public static final int FRONT_RIGHT_DRIVING_ID = 3;
-    public static final int BACK_LEFT_DRIVING_ID = 4;
-    public static final int BACK_RIGHT_DRIVING_ID = 5;
+    public static final int FRONT_LEFT_DRIVING_ID = 6;
+    public static final int FRONT_RIGHT_DRIVING_ID = 7;
+    public static final int BACK_LEFT_DRIVING_ID = 9;
+    public static final int BACK_RIGHT_DRIVING_ID = 8;
 
     // Swerve turning motors
-    public static final int FRONT_LEFT_TURNING_ID = 6;
-    public static final int FRONT_RIGHT_TURNING_ID = 7;
-    public static final int BACK_LEFT_TURNING_ID = 8;
-    public static final int BACK_RIGHT_TURNING_ID = 9;
+    public static final int FRONT_LEFT_TURNING_ID = 2;
+    public static final int FRONT_RIGHT_TURNING_ID = 3;
+    public static final int BACK_LEFT_TURNING_ID = 5;
+    public static final int BACK_RIGHT_TURNING_ID = 4;
 
-    // These are not CAN ids, these are the analog ports on the roborio
-    public static final int FL_ENCODER_ANALOG_INPUT_CHANNEL = 0;
-    public static final int FR_ENCODER_ANALOG_INPUT_CHANNEL = 1;
-    public static final int BL_ENCODER_ANALOG_INPUT_CHANNEL = 2;
+    public static final int FL_ENCODER_ANALOG_INPUT_CHANNEL = 1;
+    public static final int FR_ENCODER_ANALOG_INPUT_CHANNEL = 2;
+    public static final int BL_ENCODER_ANALOG_INPUT_CHANNEL = 0;
     public static final int BR_ENCODER_ANALOG_INPUT_CHANNEL = 3;
 
     // Gyro

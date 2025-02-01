@@ -12,7 +12,7 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
   private boolean status = false;
   private boolean initialized = false;
 
-  private Swerve swerve = Swerve.getInstance();
+  public Swerve swerve = Swerve.getInstance();
 
   private ManagerStates desiredState, currentState = ManagerStates.IDLE;
 
