@@ -20,14 +20,11 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.CANConstants;
 import frc.robot.Constants.SwerveConstants;
 import frc.utils.Utils;
+import frc.utils.Utils.ElasticUtil;
 import frc.robot.OI;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -89,17 +86,9 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
   // Constructor is private to prevent multiple instances from being made
   private Swerve() {
 
-    Shuffleboard.getTab("Main").addDouble("Heading", this::getHeading);
-    Shuffleboard.getTab("Main").addBoolean("Actively turning", () -> activelyTurning);
-    Shuffleboard.getTab("Main").addDouble("Desired heading", () -> desiredHeading);
-
-    SmartDashboard.putData("Heading", new Sendable() {
-        @Override
-        public void initSendable(SendableBuilder builder) {
-          builder.addDoubleProperty("Heading", () -> getHeading(), p -> setDesiredHeading(p));
-        }
-      }
-    );
+    ElasticUtil.putBoolean("Actively turning", () -> activelyTurning);
+    ElasticUtil.putDouble("Heading", this::getHeading);
+    ElasticUtil.putDouble("Desired heading", () -> desiredHeading);
     
     angleController.setTolerance(2);
     angleController.enableContinuousInput(0, 360);

@@ -10,7 +10,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.AnalogEncoder;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -52,14 +51,14 @@ public class SwerveModule implements CheckableSubsystem {
     turningMotor = new SparkMax(turningCANId, MotorType.kBrushless);
 
     azimuth = new PIDController(0.008, 0, 0);
+    // Enable PID wrap around for the turning motor. This will allow the PID
+    // controller to go through 0 to get to the setpoint i.e. going from 170 degrees
+    // to -10 degrees will go through 180 rather than the other direction which is a
+    // longer route.
     azimuth.enableContinuousInput(-180, 180);
     azimuth.setTolerance(1);
 
     m_turningEncoder = new AnalogEncoder(encoderChannel);
-
-    // Shuffleboard.getTab("Main").addDouble("encoder" + encoderChannel, this::getEncoderDegrees);
-    // Shuffleboard.getTab("Main").addDouble("Velocity" + encoderChannel, () -> m_desiredState.speedMetersPerSecond);
-    // Shuffleboard.getTab("Main").addDouble("Angle" + encoderChannel, () -> m_desiredState.angle.getDegrees());
 
     TalonFXConfiguration driveTalonConfig = new TalonFXConfiguration();
     SparkMaxConfig turningConfig = new SparkMaxConfig();
@@ -80,17 +79,6 @@ public class SwerveModule implements CheckableSubsystem {
     turningConfig
         .idleMode(IdleMode.kBrake)
         .smartCurrentLimit(40);
-    // turningConfig.closedLoop
-    //     .feedbackSensor(FeedbackSensor.kAnalogSensor)
-    //     // These are example gains you may need to them for your own robot!
-    //     .pid(0.01, 0, 0)
-    //     .outputRange(-1, 1)
-    //     // Enable PID wrap around for the turning motor. This will allow the PID
-    //     // controller to go through 0 to get to the setpoint i.e. going from 350 degrees
-    //     // to 10 degrees will go through 0 rather than the other direction which is a
-    //     // longer route.
-    //     .positionWrappingEnabled(true)
-    //     .positionWrappingInputRange(0, turningFactor);
 
     // Apply the configuration to the motor, so it is always in
     // a consistent state regardless of what has happened to the
@@ -117,7 +105,7 @@ public class SwerveModule implements CheckableSubsystem {
     // Apply chassis angular offset to the encoder position to get the position
     // relative to the chassis.
     return new SwerveModuleState(driveMotor.getVelocity().getValueAsDouble(),
-        new Rotation2d((m_turningEncoder.get() * 2 * Math.PI) - m_chassisAngularOffset));
+        new Rotation2d(getEncoderRadians()));
   }
 
   /**
@@ -133,7 +121,7 @@ public class SwerveModule implements CheckableSubsystem {
    * @return Current angle of the module
    */
   public double getEncoderRadians() {
-    return MathUtil.angleModulus(m_turningEncoder.get() * 2 * Math.PI + m_chassisAngularOffset);
+    return MathUtil.angleModulus((m_turningEncoder.get() * 2 * Math.PI) + m_chassisAngularOffset);
   }
 
   /**
