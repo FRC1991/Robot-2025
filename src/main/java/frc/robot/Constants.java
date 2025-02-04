@@ -76,6 +76,7 @@ public abstract class Constants {
     public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(4);
     // This is the L1 gear reduction on the MK4 modules 
     public static final double DRIVING_MOTOR_REDUCTION = 8.14;
+    public static final double TURNING_MOTOR_REDUCTION = 12.8;
     // The driving motor is a Krakenx60 without FOC
     public static final double DRIVING_MOTOR_FREE_SPEED_RPM = 5800;
     public static final double DRIVING_VELOCITY_FEED_FORWARD = 1 / ModuleConstants.DRIVING_MOTOR_FREE_SPEED_RPM;

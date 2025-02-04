@@ -78,7 +78,8 @@ public class SwerveModule implements CheckableSubsystem {
 
     turningConfig
         .idleMode(IdleMode.kBrake)
-        .smartCurrentLimit(40);
+        .smartCurrentLimit(40)
+        .encoder.positionConversionFactor(ModuleConstants.TURNING_MOTOR_REDUCTION);
 
     // Apply the configuration to the motor, so it is always in
     // a consistent state regardless of what has happened to the
@@ -86,8 +87,10 @@ public class SwerveModule implements CheckableSubsystem {
     driveMotor.getConfigurator().apply(driveTalonConfig, 0.1);
     driveMotor.optimizeBusUtilization(0, 0.1);
     driveMotor.getPosition().setUpdateFrequency(4);
+
     turningMotor.configure(turningConfig, ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
+    turningMotor.getEncoder().setPosition(m_turningEncoder.get());
 
     m_chassisAngularOffset = chassisAngularOffset;
     m_desiredState.angle = new Rotation2d(getEncoderRadians());
