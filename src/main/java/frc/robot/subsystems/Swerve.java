@@ -81,7 +81,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
   private PIDController angleController = new PIDController(0.01, 0, 0);
   private boolean activelyTurning;
 
-  private double p = 1, i = 0, d = 0;
+  private double p = 5, i = 0, d = 0;
 
   private DoubleSupplier aimingAngle;
 
@@ -337,6 +337,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
     m_gyro.setYaw(0);
+    desiredHeading = 0;
   }
 
   public void setDesiredHeading(double heading) {

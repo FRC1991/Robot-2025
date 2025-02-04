@@ -43,7 +43,7 @@ public abstract class Constants {
     );
 
     // The speed modifier for the swerve drive as a percent
-    public static final double SPEED_SCALE = 0.2;
+    public static final double SPEED_SCALE = 1;
 
     // Chassis configuration
     public static final double TRACK_WIDTH = Units.inchesToMeters(22.5);
@@ -66,7 +66,7 @@ public abstract class Constants {
 
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
-    public static final double MAX_SPEED_METERS_PER_SECOND = 4.8;
+    public static final double MAX_SPEED_METERS_PER_SECOND = 5.7;
     public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2 * Math.PI; // radians per second
     public static final double MAX_DEGREES_PER_SCHEDULER_LOOP = MAX_ANGULAR_SPEED_RADIANS_PER_SECOND * (180/Math.PI) / 1000 * 20;
   }
