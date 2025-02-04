@@ -85,6 +85,7 @@ public class SwerveModule implements CheckableSubsystem {
     // hardware (being replaced, factory reset, new firmware, etc)
     driveMotor.getConfigurator().apply(driveTalonConfig, 0.1);
     driveMotor.optimizeBusUtilization(0, 0.1);
+    driveMotor.getPosition().setUpdateFrequency(4);
     turningMotor.configure(turningConfig, ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
 
@@ -101,7 +102,6 @@ public class SwerveModule implements CheckableSubsystem {
    * @return The current state of the module.
    */
   public SwerveModuleState getState() {
-    driveMotor.getVelocity().refresh();
     // Apply chassis angular offset to the encoder position to get the position
     // relative to the chassis.
     return new SwerveModuleState(driveMotor.getVelocity().getValueAsDouble(),
@@ -130,11 +130,12 @@ public class SwerveModule implements CheckableSubsystem {
    * @return The current position of the module.
    */
   public SwerveModulePosition getPosition() {
+    // driveMotor.getPosition().refresh();
     // Apply chassis angular offset to the encoder position to get the position
     // relative to the chassis.
     return new SwerveModulePosition(
         driveMotor.getPosition().getValueAsDouble(),
-        new Rotation2d((getEncoderRadians()) - m_chassisAngularOffset));
+        new Rotation2d(getEncoderRadians() - m_chassisAngularOffset));
   }
 
   /**
@@ -143,7 +144,6 @@ public class SwerveModule implements CheckableSubsystem {
    * @param desiredState Desired state with speed and angle.
    */
   public void setDesiredState(SwerveModuleState desiredState) {
-    driveMotor.getPosition().refresh();
     // Apply chassis angular offset to the desired state.
     SwerveModuleState correctedDesiredState = new SwerveModuleState();
     correctedDesiredState.speedMetersPerSecond = desiredState.speedMetersPerSecond;
