@@ -238,9 +238,9 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
     // rot *= SwerveConstants.GYRO_REVERSED ? -1 : 1;
     
     if(activelyTurning) {
-      desiredHeading = desiredHeading + (rot * SwerveConstants.MAX_DEGREES_PER_SCHEDULER_LOOP);
+      desiredHeading = desiredHeading - (rot * SwerveConstants.MAX_DEGREES_PER_SCHEDULER_LOOP);
     } else if(rot != 0) {
-      desiredHeading = getHeading() + (rot * SwerveConstants.MAX_DEGREES_PER_SCHEDULER_LOOP);
+      desiredHeading = getHeading() - (rot * SwerveConstants.MAX_DEGREES_PER_SCHEDULER_LOOP);
     } else {}
 
     desiredHeading = MathUtil.inputModulus(desiredHeading, 0, 360);
