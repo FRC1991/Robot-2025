@@ -130,7 +130,6 @@ public class SwerveModule implements CheckableSubsystem {
    * @return The current position of the module.
    */
   public SwerveModulePosition getPosition() {
-    driveMotor.getPosition().refresh();
     // Apply chassis angular offset to the encoder position to get the position
     // relative to the chassis.
     return new SwerveModulePosition(
@@ -144,6 +143,7 @@ public class SwerveModule implements CheckableSubsystem {
    * @param desiredState Desired state with speed and angle.
    */
   public void setDesiredState(SwerveModuleState desiredState) {
+    driveMotor.getPosition().refresh();
     // Apply chassis angular offset to the desired state.
     SwerveModuleState correctedDesiredState = new SwerveModuleState();
     correctedDesiredState.speedMetersPerSecond = desiredState.speedMetersPerSecond;
@@ -156,7 +156,7 @@ public class SwerveModule implements CheckableSubsystem {
     driveMotor.set(Utils.normalize(correctedDesiredState.speedMetersPerSecond / SwerveConstants.MAX_SPEED_METERS_PER_SECOND));
     
     // azimuth.setSetpoint(correctedDesiredState.angle.getDegrees());
-    
+
     double error = azimuth.calculate(getEncoderDegrees(), correctedDesiredState.angle.getDegrees());
 
     if(Math.abs(error) < 0.02) {
