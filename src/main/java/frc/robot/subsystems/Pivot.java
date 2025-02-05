@@ -7,8 +7,11 @@ package frc.robot.subsystems;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CANConstants;
+import frc.robot.Constants.PivotConstants;
+import frc.utils.Utils;
 
 // This is for the coral
 public class Pivot extends SubsystemBase implements CheckableSubsystem, StateSubsystem {
@@ -18,11 +21,15 @@ public class Pivot extends SubsystemBase implements CheckableSubsystem, StateSub
 
   private SparkMax motor;
 
+  private PIDController posController;
+
   private PivotStates desiredState, currentState = PivotStates.IDLE;
 
   /** Creates a new Pivots. */
   public Pivot() {
     motor = new SparkMax(CANConstants.PIVOT_ID, MotorType.kBrushless);
+
+    posController = new PIDController(0, 0, 0);
 
     initialized = true;
     status = true;
@@ -62,10 +69,13 @@ public class Pivot extends SubsystemBase implements CheckableSubsystem, StateSub
         stop();
         break;
       case STORED:
+        posController.setSetpoint(PivotConstants.STORED_POSITION);
         break;
       case SCORING:
+        posController.setSetpoint(PivotConstants.SCORING_POSITION);
         break;
       case INTAKING:
+        posController.setSetpoint(PivotConstants.INTAKE_POSITION);
         break;
 
       default:
@@ -82,10 +92,9 @@ public class Pivot extends SubsystemBase implements CheckableSubsystem, StateSub
       case BROKEN:
         break;
       case STORED:
-        break;
       case SCORING:
-        break;
       case INTAKING:
+        motor.set(Utils.normalize(posController.calculate(motor.getEncoder().getPosition())));
         break;
 
       default:
