@@ -7,8 +7,10 @@ package frc.robot.subsystems;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CANConstants;
+import frc.robot.Constants.RollerConstants;
 
 // This is for the coral
 public class Roller extends SubsystemBase implements CheckableSubsystem, StateSubsystem {
@@ -18,11 +20,15 @@ public class Roller extends SubsystemBase implements CheckableSubsystem, StateSu
 
   private SparkMax motor;
 
+  private DigitalInput proximitySensor;
+
   private RollerStates desiredState, currentState = RollerStates.IDLE;
 
   /** Creates a new Rollers. */
   public Roller() {
     motor = new SparkMax(CANConstants.ROLLER_ID, MotorType.kBrushless);
+
+    proximitySensor = new DigitalInput(CANConstants.PROXIMITY_SENSOR_CHANNEL);
 
     initialized = true;
     status = true;
@@ -62,6 +68,7 @@ public class Roller extends SubsystemBase implements CheckableSubsystem, StateSu
         stop();
         break;
       case RUNNING:
+        motor.set(RollerConstants.MOTOR_SPEED);
         break;
 
       default:
@@ -78,6 +85,9 @@ public class Roller extends SubsystemBase implements CheckableSubsystem, StateSu
       case BROKEN:
         break;
       case RUNNING:
+        if(proximitySensor.get()) {
+          setDesiredState(RollerStates.IDLE);
+        }
         break;
 
       default:
