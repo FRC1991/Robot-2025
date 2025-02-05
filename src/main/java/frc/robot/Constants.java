@@ -101,6 +101,8 @@ public abstract class Constants {
     public static final int BL_ENCODER_ANALOG_INPUT_CHANNEL = 0;
     public static final int BR_ENCODER_ANALOG_INPUT_CHANNEL = 3;
 
+    public static final int PROXIMITY_SENSOR_CHANNEL = 0;
+
     // Gyro
     public static final int GYRO_ID = 10;
 
@@ -115,5 +117,21 @@ public abstract class Constants {
   public static abstract class OIConstants {
     public static final int DRIVER_CONTROLLER_PORT = 0;
     public static final double DRIVER_DEADBAND = 0.05;
+  }
+
+  public static abstract class PivotConstants {
+    // These are arbitrary values
+    public static final double STORED_POSITION = 0;
+    public static final double SCORING_POSITION = 5;
+    public static final double INTAKE_POSITION = 8;
+  }
+
+  public static abstract class RollerConstants {
+    public static final double MOTOR_SPEED = 1;
+  }
+
+  public static abstract class AlgaeConstants {
+    public static final double INTAKE_SPEED = 1;
+    public static final double SCORING_SPEED = -1;
   }
 }
