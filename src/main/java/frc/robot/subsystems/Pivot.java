@@ -23,16 +23,28 @@ public class Pivot extends SubsystemBase implements CheckableSubsystem, StateSub
 
   private PIDController posController;
 
+  private static Pivot m_Instance;
+
   private PivotStates desiredState, currentState = PivotStates.IDLE;
 
   /** Creates a new Pivots. */
-  public Pivot() {
+  private Pivot() {
     motor = new SparkMax(CANConstants.PIVOT_ID, MotorType.kBrushless);
 
     posController = new PIDController(0, 0, 0);
 
     initialized = true;
     status = true;
+  }
+
+  /**
+   * @return The main Pivot object
+   */
+  public static Pivot getInstance() {
+    if(m_Instance == null) {
+      m_Instance = new Pivot();
+    }
+    return m_Instance;
   }
 
   @Override

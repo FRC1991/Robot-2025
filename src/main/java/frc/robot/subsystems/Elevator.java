@@ -26,10 +26,12 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
 
   private PIDController posController;
 
+  private static Elevator m_Instance;
+
   private ElevatorStates desiredState, currentState = ElevatorStates.IDLE;
 
   /** Creates a new Arm. */
-  public Elevator() {
+  private Elevator() {
     motor1 = new SparkMax(CANConstants.ELEVATOR_MOTOR_ONE_ID, MotorType.kBrushless);
     motor2 = new SparkMax(CANConstants.ELEVATOR_MOTOR_TWO_ID, MotorType.kBrushless);
 
@@ -48,6 +50,16 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
 
     initialized = true;
     status = true;
+  }
+
+  /**
+   * @return The main Elevator object
+   */
+  public static Elevator getInstance() {
+    if(m_Instance == null) {
+      m_Instance = new Elevator();
+    }
+    return m_Instance;
   }
 
   private void set(double speed) {

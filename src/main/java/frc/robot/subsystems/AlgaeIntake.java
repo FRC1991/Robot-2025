@@ -19,14 +19,26 @@ public class AlgaeIntake extends SubsystemBase implements CheckableSubsystem, St
 
   private SparkMax motor;
 
+  private static AlgaeIntake m_Instance;
+
   private AlgaeStates desiredState, currentState = AlgaeStates.IDLE;
 
   /** Creates a new Algaes. */
-  public AlgaeIntake() {
+  private AlgaeIntake() {
     motor = new SparkMax(CANConstants.ALGAE_INTAKE_ID, MotorType.kBrushless);
 
     initialized = true;
     status = true;
+  }
+
+  /**
+   * @return The main Elevator object
+   */
+  public static AlgaeIntake getInstance() {
+    if(m_Instance == null) {
+      m_Instance = new AlgaeIntake();
+    }
+    return m_Instance;
   }
 
   @Override

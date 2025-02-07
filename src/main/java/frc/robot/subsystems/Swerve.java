@@ -128,7 +128,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
   }
 
   /**
-   * @return The main Pivot object
+   * @return The main Swerve object
    */
   public static Swerve getInstance() {
     if(m_Instance == null) {
