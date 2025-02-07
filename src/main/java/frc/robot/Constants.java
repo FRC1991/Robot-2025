@@ -134,4 +134,10 @@ public abstract class Constants {
     public static final double INTAKE_SPEED = 1;
     public static final double SCORING_SPEED = -1;
   }
+
+  public static abstract class ElevatorConstants {
+    public static final double ELEVATOR_MOTOR_REDUCTION = 1;
+    public static final double L1_POSITION_INCHES = 19;
+    public static final double L2_POSITION_INCHES = 32;
+  }
 }
