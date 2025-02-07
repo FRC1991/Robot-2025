@@ -56,6 +56,10 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
   @Override
   public boolean checkSubsystem() {
     status = swerve.checkSubsystem();
+    status &= spitter.checkSubsystem();
+    status &= pivot.checkSubsystem();
+    status &= elevator.checkSubsystem();
+    status &= algaeIntake.checkSubsystem();
 
     return status;
   }
