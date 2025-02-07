@@ -36,6 +36,10 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
   @Override
   public void stop() {
     swerve.stop();
+    spitter.stop();
+    pivot.stop();
+    elevator.stop();
+    algaeIntake.stop();
   }
 
   /**
