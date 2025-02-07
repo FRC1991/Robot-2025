@@ -10,10 +10,10 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CANConstants;
-import frc.robot.Constants.RollerConstants;
+import frc.robot.Constants.SpitterConstants;
 
 // This is for the coral
-public class Roller extends SubsystemBase implements CheckableSubsystem, StateSubsystem {
+public class Spitter extends SubsystemBase implements CheckableSubsystem, StateSubsystem {
 
   private boolean status = false;
   private boolean initialized = false;
@@ -22,16 +22,28 @@ public class Roller extends SubsystemBase implements CheckableSubsystem, StateSu
 
   private DigitalInput proximitySensor;
 
-  private RollerStates desiredState, currentState = RollerStates.IDLE;
+  private static Spitter m_Instance;
 
-  /** Creates a new Rollers. */
-  public Roller() {
-    motor = new SparkMax(CANConstants.ROLLER_ID, MotorType.kBrushless);
+  private SpitterStates desiredState, currentState = SpitterStates.IDLE;
+
+  /** Creates a new Spitters. */
+  private Spitter() {
+    motor = new SparkMax(CANConstants.SPITTER_ID, MotorType.kBrushless);
 
     proximitySensor = new DigitalInput(CANConstants.PROXIMITY_SENSOR_CHANNEL);
 
     initialized = true;
     status = true;
+  }
+
+  /**
+   * @return The main Spitter object
+   */
+  public static Spitter getInstance() {
+    if(m_Instance == null) {
+      m_Instance = new Spitter();
+    }
+    return m_Instance;
   }
 
   @Override
@@ -51,7 +63,7 @@ public class Roller extends SubsystemBase implements CheckableSubsystem, StateSu
     return status;
   }
 
-  public void setDesiredState(RollerStates state) {
+  public void setDesiredState(SpitterStates state) {
     if(this.desiredState != state) {
       desiredState = state;
       handleStateTransition();
@@ -68,7 +80,7 @@ public class Roller extends SubsystemBase implements CheckableSubsystem, StateSu
         stop();
         break;
       case RUNNING:
-        motor.set(RollerConstants.MOTOR_SPEED);
+        motor.set(SpitterConstants.MOTOR_SPEED);
         break;
 
       default:
@@ -86,7 +98,7 @@ public class Roller extends SubsystemBase implements CheckableSubsystem, StateSu
         break;
       case RUNNING:
         if(proximitySensor.get()) {
-          setDesiredState(RollerStates.IDLE);
+          setDesiredState(SpitterStates.IDLE);
         }
         break;
 
@@ -95,7 +107,7 @@ public class Roller extends SubsystemBase implements CheckableSubsystem, StateSu
     }
 
     if(!checkSubsystem()) {
-      setDesiredState(RollerStates.BROKEN);
+      setDesiredState(SpitterStates.BROKEN);
     }
   }
 
@@ -104,7 +116,7 @@ public class Roller extends SubsystemBase implements CheckableSubsystem, StateSu
     // This method will be called once per scheduler run
   }
 
-  public enum RollerStates {
+  public enum SpitterStates {
     IDLE,
     BROKEN,
     RUNNING;

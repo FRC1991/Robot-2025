@@ -106,7 +106,7 @@ public abstract class Constants {
     // Gyro
     public static final int GYRO_ID = 10;
 
-    public static final int ROLLER_ID = 9990;
+    public static final int SPITTER_ID = 9990;
     public static final int PIVOT_ID = 9991;
     public static final int ALGAE_INTAKE_ID = 9992;
     public static final int ELEVATOR_MOTOR_ONE_ID = 9993;
@@ -126,7 +126,7 @@ public abstract class Constants {
     public static final double INTAKE_POSITION = 8;
   }
 
-  public static abstract class RollerConstants {
+  public static abstract class SpitterConstants {
     public static final double MOTOR_SPEED = 1;
   }
 
