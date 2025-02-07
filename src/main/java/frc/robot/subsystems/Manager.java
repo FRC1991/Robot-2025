@@ -14,6 +14,9 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
 
   private Swerve swerve = Swerve.getInstance();
   private Spitter spitter = Spitter.getInstance();
+  private Pivot pivot = Pivot.getInstance();
+  private Elevator elevator = Elevator.getInstance();
+  private AlgaeIntake algaeIntake = AlgaeIntake.getInstance();
 
   private ManagerStates desiredState, currentState = ManagerStates.IDLE;
 
@@ -21,6 +24,10 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
   public Manager() {
     // All subsystems should initialize when calling getInstance()
     initialized = swerve.getInitialized();
+    initialized &= spitter.getInitialized();
+    initialized &= pivot.getInitialized();
+    initialized &= elevator.getInitialized();
+    initialized &= algaeIntake.getInitialized();
   }
 
   /**
