@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.subsystems.Manager;
+import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Manager.ManagerStates;
 import frc.utils.Utils.ElasticUtil;
 
@@ -37,7 +38,7 @@ public class RobotContainer {
     WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
     
     ElasticUtil.putString("Manager State", () -> m_Manager.getState().toString());
-    ElasticUtil.putString("Swerve State", () -> m_Manager.swerve.getState().toString());
+    ElasticUtil.putString("Swerve State", () -> Swerve.getInstance().getState().toString());
   }
 
   private void configureBindings() {
@@ -49,7 +50,7 @@ public class RobotContainer {
         .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
     
     new JoystickButton(OI.driverJoytick, 2)
-        .onTrue(new InstantCommand(() -> m_Manager.swerve.zeroHeading(), m_Manager));
+        .onTrue(new InstantCommand(() -> Swerve.getInstance().zeroHeading(), m_Manager));
   }
 
   public Command getAutonomousCommand() {
