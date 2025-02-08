@@ -70,6 +70,10 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
   @Override
   public void update() {
     swerve.update();
+    spitter.update();
+    pivot.update();
+    elevator.update();
+    algaeIntake.update();
 
     switch(currentState) {
       case IDLE:
