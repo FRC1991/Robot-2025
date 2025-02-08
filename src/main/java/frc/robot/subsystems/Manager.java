@@ -155,5 +155,15 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
     DRIVE,
     /** Locking the wheels in an X formation */
     LOCKED,
+    /** Running the AlgaeIntake to pull an Agae into our robot */
+    ALGAE_INTAKE,
+    /** Pushing the Algae out of our robot and into the processor */
+    ALGAE_SCORE,
+    /** Intaking coral from the coral station through the funnel */
+    CORAL_INTAKE,
+    /** Scoring coral in the L1 trough */
+    CORAL_L1,
+    /** Scoring coral on the L2 branch */
+    CORAL_L2;
   }
 }
