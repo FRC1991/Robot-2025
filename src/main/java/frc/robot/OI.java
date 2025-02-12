@@ -5,7 +5,9 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.OIConstants;
+import frc.utils.Utils;
 
 /** The Operating Interface 
  * This class is abstract and has a private constructor to prevent instantiation.
@@ -15,6 +17,7 @@ public abstract class OI {
 
   // The Driver's joystick
   public static final Joystick driverJoytick = new Joystick(OIConstants.DRIVER_CONTROLLER_PORT);
+  public static final XboxController driverController = new XboxController(3);
 
   public static double[] getMappedJoysticks() {
     // Convert XY to polar for mapping
@@ -50,6 +53,8 @@ public abstract class OI {
    * @return Output value mapped to the function
    */
   public static double mappingFunction(double x) {
+    x = Utils.normalize(x);
+    
     if(x <= 0.759808) {
       return
           0.452515 * Math.pow(x, 5) +

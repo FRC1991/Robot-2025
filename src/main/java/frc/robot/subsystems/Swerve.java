@@ -294,9 +294,9 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
    * Sets the wheels to their zero.
    */
   public void setTank() {
-    m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
+    m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(180)));
     m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
-    m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
+    m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(180)));
     m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(0)));
   }
 
@@ -419,9 +419,9 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
       case DRIVE:
         if(DriverStation.isTeleopEnabled()) {
           drive(
-              MathUtil.applyDeadband(OI.driverJoytick.getY(), 0.05),
-              MathUtil.applyDeadband(OI.driverJoytick.getX(), 0.05),
-              MathUtil.applyDeadband(OI.driverJoytick.getZ(), 0.05),
+              MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftY()), 0.08),
+              MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftX()), 0.08),
+              MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getRightX()), 0.08),
               true, SwerveConstants.SPEED_SCALE);
         }
         break;
