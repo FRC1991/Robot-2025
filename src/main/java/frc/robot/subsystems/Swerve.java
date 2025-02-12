@@ -236,8 +236,6 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
     // Convert the commanded speeds into the correct units for the drivetrain and scaling the speed
     double xSpeedDelivered = xSpeed * SwerveConstants.MAX_SPEED_METERS_PER_SECOND;
     double ySpeedDelivered = ySpeed * SwerveConstants.MAX_SPEED_METERS_PER_SECOND;
-
-    // rot *= SwerveConstants.GYRO_REVERSED ? -1 : 1;
     
     if(activelyTurning) {
       desiredHeading = desiredHeading - (rot * SwerveConstants.MAX_DEGREES_PER_SCHEDULER_LOOP);
@@ -249,7 +247,9 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
 
     angleController.setPID(p, i, d);
 
-    double rotDelivered = Utils.normalize(angleController.calculate(getHeading(), desiredHeading)) * SwerveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND * -1;
+    double rotDelivered = Utils.normalize(angleController.calculate(getHeading(), desiredHeading)) * SwerveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
+
+    rotDelivered = rotDelivered * (SwerveConstants.GYRO_REVERSED ? -1 : 1);
 
     var swerveModuleStates = SwerveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
         fieldRelative
