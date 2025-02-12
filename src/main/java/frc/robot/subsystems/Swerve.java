@@ -78,10 +78,10 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
   private SwerveStates desiredState, currentState = SwerveStates.IDLE;
 
   private double desiredHeading;
-  private PIDController angleController = new PIDController(0.01, 0, 0);
+  private PIDController angleController = new PIDController(0, 0, 0);
   private boolean activelyTurning;
 
-  private double p = 5, i = 0, d = 0;
+  private double p = 0.01, i = 0, d = 0;
 
   private DoubleSupplier aimingAngle;
 
@@ -91,12 +91,14 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
     ElasticUtil.putBoolean("Actively turning", () -> activelyTurning);
     ElasticUtil.putDouble("Heading", this::getHeading);
     ElasticUtil.putDouble("Desired heading", () -> desiredHeading);
-    ElasticUtil.putDouble("P", () -> p, value -> {p=value;});
-    ElasticUtil.putDouble("I", () -> i, value -> {i=value;});
-    ElasticUtil.putDouble("D", () -> d, value -> {d=value;});
+    ElasticUtil.putDouble("P", () -> this.p, value -> {this.p=value;});
+    ElasticUtil.putDouble("I", () -> this.i, value -> {this.i=value;});
+    ElasticUtil.putDouble("D", () -> this.d, value -> {this.d=value;});
+    ElasticUtil.putDouble("turning power", () -> angleController.calculate(getHeading(), desiredHeading));
     
     angleController.setTolerance(2);
     angleController.enableContinuousInput(0, 360);
+    angleController.setPID(p, i, d);
 
     // Configure AutoBuilder last
     AutoBuilder.configure(
@@ -245,7 +247,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
 
     desiredHeading = MathUtil.inputModulus(desiredHeading, 0, 360);
 
-    // angleController.setPID(p, i, d);
+    angleController.setPID(p, i, d);
 
     double rotDelivered = Utils.normalize(angleController.calculate(getHeading(), desiredHeading)) * SwerveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND * -1;
 
