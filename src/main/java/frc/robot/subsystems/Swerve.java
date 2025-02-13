@@ -22,6 +22,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.CANConstants;
+import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.SwerveConstants;
 import frc.utils.Utils;
 import frc.utils.Utils.ElasticUtil;
@@ -419,18 +420,18 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
       case DRIVE:
         if(DriverStation.isTeleopEnabled()) {
           drive(
-              MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftY()), 0.08),
-              MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftX()), 0.08),
-              MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getRightX()), 0.08),
+              MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftY()), OIConstants.DRIVER_DEADBAND),
+              MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftX()), OIConstants.DRIVER_DEADBAND),
+              MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getRightX()), OIConstants.DRIVER_DEADBAND),
               true, SwerveConstants.SPEED_SCALE);
         }
         break;
       case AIMING:
         if(DriverStation.isTeleopEnabled()) {
           drive(
-              -OI.getMappedJoysticks()[0],
-              -OI.getMappedJoysticks()[1],
-              -OI.mappingFunction(aimingAngle.getAsDouble()),
+              MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftY()), OIConstants.DRIVER_DEADBAND),
+              MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftX()), OIConstants.DRIVER_DEADBAND),
+              aimingAngle.getAsDouble(),
               true, SwerveConstants.SPEED_SCALE);
         }
         break;

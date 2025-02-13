@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.OIConstants;
 import frc.utils.Utils;
@@ -16,13 +15,12 @@ public abstract class OI {
   private OI() {}
 
   // The Driver's joystick
-  public static final Joystick driverJoytick = new Joystick(OIConstants.DRIVER_CONTROLLER_PORT);
-  public static final XboxController driverController = new XboxController(3);
+  public static final XboxController driverController = new XboxController(OIConstants.DRIVER_CONTROLLER_PORT);
 
   public static double[] getMappedJoysticks() {
     // Convert XY to polar for mapping
-    double inputTranslationDir = Math.atan2(driverJoytick.getY(), driverJoytick.getX());
-    double inputTranslationMag = Math.sqrt(Math.pow(driverJoytick.getY(), 2) + Math.pow(driverJoytick.getX(), 2));
+    double inputTranslationDir = Math.atan2(driverController.getLeftY(), driverController.getLeftX());
+    double inputTranslationMag = Math.sqrt(Math.pow(driverController.getLeftY(), 2) + Math.pow(driverController.getLeftX(), 2));
 
     // Deadband
     if(inputTranslationMag <= OIConstants.DRIVER_DEADBAND) {
