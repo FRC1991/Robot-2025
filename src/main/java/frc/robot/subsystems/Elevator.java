@@ -105,6 +105,12 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
       case BROKEN:
         stop();
         break;
+      case INTAKING:
+        posController.setSetpoint(ElevatorConstants.INTAKING_POSITION);
+        break;
+      case STORED:
+        posController.setSetpoint(ElevatorConstants.STORED_POSITION);
+        break;
       case L1:
         posController.setSetpoint(ElevatorConstants.L1_POSITION_INCHES);
         break;
@@ -125,7 +131,15 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
         break;
       case BROKEN:
         break;
+      case INTAKING:
+        set(Utils.normalize(posController.calculate(getEncoder())));
+        break;
+      case STORED:
+        set(Utils.normalize(posController.calculate(getEncoder())));
+        break;
       case L1:
+        set(Utils.normalize(posController.calculate(getEncoder())));
+        break;
       case L2:
         set(Utils.normalize(posController.calculate(getEncoder())));
         break;
@@ -148,7 +162,8 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
   public enum ElevatorStates {
     IDLE,
     BROKEN,
-    INTAKE,
+    INTAKING,
+    STORED,
     L1,
     L2,
   }

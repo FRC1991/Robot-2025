@@ -5,6 +5,10 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.AlgaeIntake.AlgaeStates;
+import frc.robot.subsystems.Elevator.ElevatorStates;
+import frc.robot.subsystems.Pivot.PivotStates;
+import frc.robot.subsystems.Spitter.SpitterStates;
 import frc.robot.subsystems.Swerve.SwerveStates;
 
 public class Manager extends SubsystemBase implements CheckableSubsystem, StateSubsystem {
@@ -84,6 +88,16 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
         break;
       case LOCKED:
         break;
+      case ALGAE_INTAKE:
+        break;
+      case ALGAE_SCORE:
+        break;
+      case CORAL_INTAKE:
+        break;
+      case CORAL_L1:
+        break;
+      case CORAL_L2:
+        break;
 
       default:
         break;
@@ -99,12 +113,59 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
     switch(desiredState) {
       case IDLE:
         swerve.setDesiredState(SwerveStates.IDLE);
+        spitter.setDesiredState(SpitterStates.IDLE);
+        pivot.setDesiredState(PivotStates.IDLE);
+        elevator.setDesiredState(ElevatorStates.IDLE);
+        algaeIntake.setDesiredState(AlgaeStates.IDLE);
         break;
       case DRIVE:
         swerve.setDesiredState(SwerveStates.DRIVE);
+        spitter.setDesiredState(SpitterStates.IDLE);
+        pivot.setDesiredState(PivotStates.STORED);
+        elevator.setDesiredState(ElevatorStates.STORED);
+        algaeIntake.setDesiredState(AlgaeStates.IDLE);
         break;
       case LOCKED:
         swerve.setDesiredState(SwerveStates.LOCKED);
+        spitter.setDesiredState(SpitterStates.IDLE);
+        pivot.setDesiredState(PivotStates.STORED);
+        elevator.setDesiredState(ElevatorStates.STORED);
+        algaeIntake.setDesiredState(AlgaeStates.IDLE);
+        break;
+      case ALGAE_INTAKE:
+        swerve.setDesiredState(SwerveStates.DRIVE);
+        spitter.setDesiredState(SpitterStates.IDLE);
+        pivot.setDesiredState(PivotStates.INTAKING);
+        elevator.setDesiredState(ElevatorStates.STORED);
+        algaeIntake.setDesiredState(AlgaeStates.INTAKING);
+        break;
+      case ALGAE_SCORE:
+        swerve.setDesiredState(SwerveStates.DRIVE);
+        spitter.setDesiredState(SpitterStates.IDLE);
+        pivot.setDesiredState(PivotStates.SCORING);
+        elevator.setDesiredState(ElevatorStates.STORED);
+        algaeIntake.setDesiredState(AlgaeStates.SCORING);
+        break;
+      case CORAL_INTAKE:
+        swerve.setDesiredState(SwerveStates.DRIVE);
+        spitter.setDesiredState(SpitterStates.RUNNING);
+        pivot.setDesiredState(PivotStates.STORED);
+        elevator.setDesiredState(ElevatorStates.INTAKING);
+        algaeIntake.setDesiredState(AlgaeStates.IDLE);
+        break;
+      case CORAL_L1:
+        swerve.setDesiredState(SwerveStates.DRIVE);
+        spitter.setDesiredState(SpitterStates.RUNNING);
+        pivot.setDesiredState(PivotStates.STORED);
+        elevator.setDesiredState(ElevatorStates.L1);
+        algaeIntake.setDesiredState(AlgaeStates.IDLE);
+        break;
+      case CORAL_L2:
+        swerve.setDesiredState(SwerveStates.DRIVE);
+        spitter.setDesiredState(SpitterStates.RUNNING);
+        pivot.setDesiredState(PivotStates.STORED);
+        elevator.setDesiredState(ElevatorStates.L2);
+        algaeIntake.setDesiredState(AlgaeStates.IDLE);
         break;
 
       default:
