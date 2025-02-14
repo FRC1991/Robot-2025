@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.CANConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.SwerveConstants;
+import frc.utils.LimelightHelpers;
 import frc.utils.Utils;
 import frc.utils.Utils.ElasticUtil;
 import frc.robot.OI;
@@ -429,9 +430,9 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
       case AIMING:
         if(DriverStation.isTeleopEnabled()) {
           drive(
-              MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftY()), OIConstants.DRIVER_DEADBAND),
+              LimelightHelpers.getTX("algae") / 29.8,
               MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftX()), OIConstants.DRIVER_DEADBAND),
-              aimingAngle.getAsDouble(),
+              0,
               true, SwerveConstants.SPEED_SCALE);
         }
         break;
@@ -463,7 +464,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
       case DRIVE:
         break;
       case AIMING:
-        angleController.setSetpoint(0);
+        angleController.setSetpoint(90);
         break;
       case LOCKED:
         setX();
