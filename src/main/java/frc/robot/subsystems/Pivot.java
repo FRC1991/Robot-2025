@@ -5,10 +5,15 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.CANConstants;
 import frc.robot.Constants.PivotConstants;
 import frc.utils.Utils;
@@ -30,6 +35,14 @@ public class Pivot extends SubsystemBase implements CheckableSubsystem, StateSub
   /** Creates a new Pivots. */
   private Pivot() {
     motor = new SparkMax(CANConstants.PIVOT_ID, MotorType.kBrushless);
+
+    SparkMaxConfig pivotConfig = new SparkMaxConfig();
+
+    pivotConfig.idleMode(IdleMode.kBrake)
+        .smartCurrentLimit(Constants.NEO_CURRENT_LIMIT);
+
+    motor.configure(pivotConfig, ResetMode.kResetSafeParameters,
+        PersistMode.kPersistParameters);
 
     posController = new PIDController(0, 0, 0);
 
