@@ -145,5 +145,6 @@ public abstract class Constants {
     public static final double L2_POSITION_INCHES = 32;
     public static final double STORED_POSITION = 0;
     public static final double INTAKING_POSITION = 0;
+    public static final double PID_ERROR_TOLERANCE = 0;
   }
 }

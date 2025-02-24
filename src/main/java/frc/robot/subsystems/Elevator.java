@@ -56,7 +56,7 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
     ElasticUtil.putDouble("elevator D", () -> this.d, value -> {this.d=value;});
 
     posController = new PIDController(p, i, d);
-    posController.setTolerance(PivotConstants.PID_ERROR_TOLERANCE);
+    posController.setTolerance(ElevatorConstants.PID_ERROR_TOLERANCE);
 
     posController = new PIDController(0, 0, 0);
 
@@ -139,7 +139,7 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
 
   public void update() {
     posController.setPID(p, i, d);
-    
+
     switch(currentState) {
       case IDLE:
         break;
