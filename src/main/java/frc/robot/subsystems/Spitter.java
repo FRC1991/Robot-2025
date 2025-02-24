@@ -18,7 +18,7 @@ public class Spitter extends SubsystemBase implements CheckableSubsystem, StateS
   private boolean status = false;
   private boolean initialized = false;
 
-  private SparkMax motor;
+  private SparkMax motor1, motor2;
 
   private DigitalInput proximitySensor;
 
@@ -28,7 +28,8 @@ public class Spitter extends SubsystemBase implements CheckableSubsystem, StateS
 
   /** Creates a new Spitters. */
   private Spitter() {
-    motor = new SparkMax(CANConstants.SPITTER_ID, MotorType.kBrushless);
+    motor1 = new SparkMax(CANConstants.SPITTER_MOTOR_ONE_ID, MotorType.kBrushless);
+    motor2 = new SparkMax(CANConstants.SPITTER_MOTOR_TWO_ID, MotorType.kBrushless);
 
     proximitySensor = new DigitalInput(CANConstants.PROXIMITY_SENSOR_CHANNEL);
 
@@ -48,7 +49,8 @@ public class Spitter extends SubsystemBase implements CheckableSubsystem, StateS
 
   @Override
   public void stop() {
-    motor.stopMotor();
+    motor1.stopMotor();
+    motor2.stopMotor();
   }
 
   @Override
@@ -80,7 +82,8 @@ public class Spitter extends SubsystemBase implements CheckableSubsystem, StateS
         stop();
         break;
       case RUNNING:
-        motor.set(SpitterConstants.MOTOR_SPEED);
+        motor1.set(SpitterConstants.MOTOR_SPEED);
+        motor2.set(-SpitterConstants.MOTOR_SPEED);
         break;
 
       default:
