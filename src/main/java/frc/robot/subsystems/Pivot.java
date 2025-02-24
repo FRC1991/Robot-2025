@@ -146,6 +146,13 @@ public class Pivot extends SubsystemBase implements CheckableSubsystem, StateSub
     // This method will be called once per scheduler run
   }
 
+  /**
+   * @return The current state of the subsystem
+   */
+  public PivotStates getState() {
+    return currentState;
+  }
+
   public enum PivotStates {
     IDLE,
     BROKEN,

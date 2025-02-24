@@ -172,6 +172,13 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
     // This method will be called once per scheduler run
   }
 
+  /**
+   * @return The current state of the subsystem
+   */
+  public ElevatorStates getState() {
+    return currentState;
+  }
+
   public enum ElevatorStates {
     IDLE,
     BROKEN,

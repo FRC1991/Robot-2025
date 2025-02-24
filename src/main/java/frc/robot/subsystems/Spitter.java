@@ -134,6 +134,13 @@ public class Spitter extends SubsystemBase implements CheckableSubsystem, StateS
     // This method will be called once per scheduler run
   }
 
+  /**
+   * @return The current state of the subsystem
+   */
+  public SpitterStates getState() {
+    return currentState;
+  }
+
   public enum SpitterStates {
     IDLE,
     BROKEN,

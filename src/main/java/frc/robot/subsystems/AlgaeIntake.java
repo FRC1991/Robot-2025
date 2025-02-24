@@ -126,6 +126,13 @@ public class AlgaeIntake extends SubsystemBase implements CheckableSubsystem, St
     // This method will be called once per scheduler run
   }
 
+  /**
+   * @return The current state of the subsystem
+   */
+  public AlgaeStates getState() {
+    return currentState;
+  }
+
   public enum AlgaeStates {
     IDLE,
     BROKEN,
