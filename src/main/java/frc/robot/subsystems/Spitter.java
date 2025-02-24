@@ -5,10 +5,15 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.CANConstants;
 import frc.robot.Constants.SpitterConstants;
 
@@ -30,6 +35,16 @@ public class Spitter extends SubsystemBase implements CheckableSubsystem, StateS
   private Spitter() {
     motor1 = new SparkMax(CANConstants.SPITTER_MOTOR_ONE_ID, MotorType.kBrushless);
     motor2 = new SparkMax(CANConstants.SPITTER_MOTOR_TWO_ID, MotorType.kBrushless);
+
+    SparkMaxConfig spitterConfig = new SparkMaxConfig();
+
+    spitterConfig.idleMode(IdleMode.kBrake)
+        .smartCurrentLimit(Constants.NEO_CURRENT_LIMIT);
+
+    motor1.configure(spitterConfig, ResetMode.kResetSafeParameters,
+        PersistMode.kPersistParameters);
+    motor2.configure(spitterConfig, ResetMode.kResetSafeParameters,
+        PersistMode.kPersistParameters);
 
     proximitySensor = new DigitalInput(CANConstants.PROXIMITY_SENSOR_CHANNEL);
 
