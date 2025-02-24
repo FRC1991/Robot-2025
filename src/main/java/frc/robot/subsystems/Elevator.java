@@ -13,6 +13,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.CANConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.utils.Utils;
@@ -38,7 +39,7 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
     SparkMaxConfig elevatorConfig = new SparkMaxConfig();
 
     elevatorConfig.idleMode(IdleMode.kBrake)
-        .smartCurrentLimit(40)
+        .smartCurrentLimit(Constants.NEO_CURRENT_LIMIT)
         .encoder.positionConversionFactor(ElevatorConstants.ELEVATOR_MOTOR_REDUCTION);
 
     motor1.configure(elevatorConfig, ResetMode.kResetSafeParameters,

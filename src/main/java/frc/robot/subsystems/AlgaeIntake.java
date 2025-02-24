@@ -5,10 +5,15 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CANConstants;
+import frc.robot.Constants;
 import frc.robot.Constants.AlgaeConstants;
 
 // This is for the coral
@@ -26,6 +31,14 @@ public class AlgaeIntake extends SubsystemBase implements CheckableSubsystem, St
   /** Creates a new Algaes. */
   private AlgaeIntake() {
     motor = new SparkMax(CANConstants.ALGAE_INTAKE_ID, MotorType.kBrushless);
+
+    SparkMaxConfig algaeIntakeConfig = new SparkMaxConfig();
+
+    algaeIntakeConfig.idleMode(IdleMode.kCoast)
+        .smartCurrentLimit(Constants.CURRENT_LIMIT_550);
+
+    motor.configure(algaeIntakeConfig, ResetMode.kResetSafeParameters,
+        PersistMode.kPersistParameters);
 
     initialized = true;
     status = true;
