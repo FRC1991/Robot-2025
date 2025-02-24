@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.CANConstants;
 import frc.robot.Constants.SpitterConstants;
+import frc.utils.Utils.ElasticUtil;
 
 // This is for the coral
 public class Spitter extends SubsystemBase implements CheckableSubsystem, StateSubsystem {
@@ -47,6 +48,8 @@ public class Spitter extends SubsystemBase implements CheckableSubsystem, StateS
         PersistMode.kPersistParameters);
 
     proximitySensor = new DigitalInput(CANConstants.PROXIMITY_SENSOR_CHANNEL);
+
+    ElasticUtil.putBoolean("Proximity Sensor", proximitySensor::get);
 
     initialized = true;
     status = true;

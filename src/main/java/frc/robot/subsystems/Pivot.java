@@ -50,6 +50,7 @@ public class Pivot extends SubsystemBase implements CheckableSubsystem, StateSub
     ElasticUtil.putDouble("pivot P", () -> this.p, value -> {this.p=value;});
     ElasticUtil.putDouble("pivot I", () -> this.i, value -> {this.i=value;});
     ElasticUtil.putDouble("pivot D", () -> this.d, value -> {this.d=value;});
+    ElasticUtil.putDouble("Pivot Position", motor.getEncoder()::getPosition);
 
     posController = new PIDController(p, i, d);
     posController.setTolerance(PivotConstants.PID_ERROR_TOLERANCE);
