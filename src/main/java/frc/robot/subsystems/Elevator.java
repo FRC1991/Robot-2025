@@ -76,7 +76,7 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
 
   private void set(double speed) {
     motor1.set(speed);
-    motor2.set(speed);
+    motor2.set(-speed);
   }
 
   @Override
@@ -86,7 +86,7 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
   }
 
   public double getEncoder() {
-    return (motor1.getEncoder().getPosition() + motor2.getEncoder().getPosition()) / 2;
+    return (motor1.getEncoder().getPosition() - motor2.getEncoder().getPosition()) / 2;
   }
 
   @Override
