@@ -127,6 +127,7 @@ public abstract class Constants {
     public static final double STORED_POSITION = 0;
     public static final double SCORING_POSITION = 5;
     public static final double INTAKE_POSITION = 8;
+    public static final double PID_ERROR_TOLERANCE = 0;
   }
 
   public static abstract class SpitterConstants {

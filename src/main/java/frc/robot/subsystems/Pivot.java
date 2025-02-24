@@ -17,6 +17,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.CANConstants;
 import frc.robot.Constants.PivotConstants;
 import frc.utils.Utils;
+import frc.utils.Utils.ElasticUtil;
 
 // This is for the coral
 public class Pivot extends SubsystemBase implements CheckableSubsystem, StateSubsystem {
@@ -29,6 +30,8 @@ public class Pivot extends SubsystemBase implements CheckableSubsystem, StateSub
   private PIDController posController;
 
   private static Pivot m_Instance;
+
+  private double p = 0.01, i = 0, d = 0;
 
   private PivotStates desiredState, currentState = PivotStates.IDLE;
 
@@ -44,7 +47,12 @@ public class Pivot extends SubsystemBase implements CheckableSubsystem, StateSub
     motor.configure(pivotConfig, ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
 
-    posController = new PIDController(0, 0, 0);
+    ElasticUtil.putDouble("pivot P", () -> this.p, value -> {this.p=value;});
+    ElasticUtil.putDouble("pivot I", () -> this.i, value -> {this.i=value;});
+    ElasticUtil.putDouble("pivot D", () -> this.d, value -> {this.d=value;});
+
+    posController = new PIDController(p, i, d);
+    posController.setTolerance(PivotConstants.PID_ERROR_TOLERANCE);
 
     initialized = true;
     status = true;
@@ -111,6 +119,8 @@ public class Pivot extends SubsystemBase implements CheckableSubsystem, StateSub
   }
 
   public void update() {
+    posController.setPID(p, i, d);
+
     switch(currentState) {
       case IDLE:
         break;

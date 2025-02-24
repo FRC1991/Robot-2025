@@ -16,7 +16,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.CANConstants;
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.PivotConstants;
 import frc.utils.Utils;
+import frc.utils.Utils.ElasticUtil;
 
 public class Elevator extends SubsystemBase implements CheckableSubsystem, StateSubsystem {
 
@@ -28,6 +30,8 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
   private PIDController posController;
 
   private static Elevator m_Instance;
+  
+  private double p = 0.01, i = 0, d = 0;
 
   private ElevatorStates desiredState, currentState = ElevatorStates.IDLE;
 
@@ -46,6 +50,13 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
         PersistMode.kPersistParameters);
     motor2.configure(elevatorConfig, ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
+
+    ElasticUtil.putDouble("elevator P", () -> this.p, value -> {this.p=value;});
+    ElasticUtil.putDouble("elevator I", () -> this.i, value -> {this.i=value;});
+    ElasticUtil.putDouble("elevator D", () -> this.d, value -> {this.d=value;});
+
+    posController = new PIDController(p, i, d);
+    posController.setTolerance(PivotConstants.PID_ERROR_TOLERANCE);
 
     posController = new PIDController(0, 0, 0);
 
@@ -127,6 +138,8 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
   }
 
   public void update() {
+    posController.setPID(p, i, d);
+    
     switch(currentState) {
       case IDLE:
         break;
