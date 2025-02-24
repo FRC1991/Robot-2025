@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.CANConstants;
 import frc.robot.Constants.ElevatorConstants;
-import frc.robot.Constants.PivotConstants;
 import frc.utils.Utils;
 import frc.utils.Utils.ElasticUtil;
 
