@@ -52,6 +52,8 @@ public class RobotContainer {
   private void configureBindings() {
     m_Manager.setDefaultCommand(new RunCommand(() -> m_Manager.update(), m_Manager));
 
+    // new Trigger(OI.driverController::getLeftBumperButton)
+    //     .onTrue(new InstantCommand(()))
     // Stops movement by setting the wheels in an X formation
     new Trigger(OI.driverController::getAButton)
         .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.LOCKED), m_Manager))
