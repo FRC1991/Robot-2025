@@ -52,8 +52,14 @@ public class RobotContainer {
   private void configureBindings() {
     m_Manager.setDefaultCommand(new RunCommand(() -> m_Manager.update(), m_Manager));
 
-    // new Trigger(OI.driverController::getLeftBumperButton)
-    //     .onTrue(new InstantCommand(()))
+    new Trigger(OI.driverController::getRightBumperButton)
+        .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.ALGAE_SCORE), m_Manager))
+        .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
+
+    new Trigger(OI.driverController::getLeftBumperButton)
+        .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.ALGAE_INTAKE), m_Manager))
+        .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
+
     // Stops movement by setting the wheels in an X formation
     new Trigger(OI.driverController::getAButton)
         .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.LOCKED), m_Manager))
