@@ -112,14 +112,14 @@ public abstract class Constants {
     public static final int SPITTER_MOTOR_TWO_ID = 9991;
     public static final int PIVOT_ID = 9992;
     public static final int ALGAE_INTAKE_ID = 9993;
-    public static final int ELEVATOR_MOTOR_ONE_ID = 9994;
-    public static final int ELEVATOR_MOTOR_TWO_ID = 9995;
+    public static final int ELEVATOR_MOTOR_ONE_ID = 11;
+    public static final int ELEVATOR_MOTOR_TWO_ID = 12;
     public static final int FLIPPER_ID = 9996;
   }
 
   public static abstract class OIConstants {
     public static final int DRIVER_CONTROLLER_PORT = 0;
-    public static final double DRIVER_DEADBAND = 0.05;
+    public static final double DRIVER_DEADBAND = 0.07;
   }
 
   public static abstract class PivotConstants {
@@ -140,7 +140,7 @@ public abstract class Constants {
   }
 
   public static abstract class ElevatorConstants {
-    public static final double ELEVATOR_MOTOR_REDUCTION = 1;
+    public static final double ELEVATOR_MOTOR_REDUCTION = 0.0074;
     public static final double L1_POSITION_INCHES = 19;
     public static final double L2_POSITION_INCHES = 32;
     public static final double STORED_POSITION = 0;

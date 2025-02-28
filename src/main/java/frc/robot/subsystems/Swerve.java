@@ -128,7 +128,6 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
     );
 
     zeroHeading();
-    desiredHeading = 0;
   }
 
   /**

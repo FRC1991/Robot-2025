@@ -60,6 +60,9 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
 
     posController = new PIDController(0, 0, 0);
 
+    motor1.getEncoder().setPosition(0);
+    motor2.getEncoder().setPosition(0);
+
     initialized = true;
     status = true;
   }
