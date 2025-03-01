@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Manager;
@@ -52,35 +51,33 @@ public class RobotContainer {
   private void configureBindings() {
     m_Manager.setDefaultCommand(new RunCommand(() -> m_Manager.update(), m_Manager));
 
-    new Trigger(OI.driverController::getYButton)
+    OI.driverController.y()
         .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.CORAL_L1), m_Manager))
         .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
-
-    new Trigger(OI.driverController::getBButton)
+    OI.driverController.b()
         .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.CORAL_L2), m_Manager))
         .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
 
-    new Trigger(OI.driverController::getXButton)
+    OI.driverController.x()
         .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.CORAL_INTAKE), m_Manager))
         .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
-
-    new Trigger(OI.driverController::getRightBumperButton)
+    
+    OI.driverController.rightBumper()
         .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.ALGAE_SCORE), m_Manager))
         .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
 
-    new Trigger(OI.driverController::getLeftBumperButton)
+    OI.driverController.leftBumper()
         .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.ALGAE_INTAKE), m_Manager))
         .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
-
+    
     // Stops movement by setting the wheels in an X formation
-    new Trigger(OI.driverController::getAButton)
+    OI.driverController.a()
         .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.LOCKED), m_Manager))
         .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
-
+    
     // Zeroes out the gyro
-    new Trigger(OI.driverController::getStartButton)
-        .onTrue(new InstantCommand(() -> Swerve.getInstance().zeroHeading(), m_Manager)
-    );
+    OI.driverController.start()
+      .onTrue(new InstantCommand(() -> Swerve.getInstance().zeroHeading(), m_Manager));
   }
 
   public Command getAutonomousCommand() {

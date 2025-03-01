@@ -4,7 +4,7 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OIConstants;
 import frc.utils.Utils;
 
@@ -15,7 +15,7 @@ public abstract class OI {
   private OI() {}
 
   // The Driver's joystick
-  public static final XboxController driverController = new XboxController(OIConstants.DRIVER_CONTROLLER_PORT);
+  public static final CommandXboxController driverController = new CommandXboxController(OIConstants.DRIVER_CONTROLLER_PORT);
 
   public static double[] getMappedJoysticks() {
     // Convert XY to polar for mapping

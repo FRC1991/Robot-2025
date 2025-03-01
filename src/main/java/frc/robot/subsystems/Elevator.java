@@ -54,11 +54,11 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
     ElasticUtil.putDouble("elevator I", () -> this.i, value -> {this.i=value;});
     ElasticUtil.putDouble("elevator D", () -> this.d, value -> {this.d=value;});
     ElasticUtil.putDouble("Elevator Position", this::getEncoder);
+    ElasticUtil.putDouble("elevator pos 1", motor1.getEncoder()::getPosition);
+    ElasticUtil.putDouble("elevator pos 2", motor2.getEncoder()::getPosition);
 
     posController = new PIDController(p, i, d);
     posController.setTolerance(ElevatorConstants.PID_ERROR_TOLERANCE);
-
-    posController = new PIDController(0, 0, 0);
 
     motor1.getEncoder().setPosition(0);
     motor2.getEncoder().setPosition(0);
