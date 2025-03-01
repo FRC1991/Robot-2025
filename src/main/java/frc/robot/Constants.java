@@ -140,9 +140,9 @@ public abstract class Constants {
   }
 
   public static abstract class ElevatorConstants {
-    public static final double ELEVATOR_MOTOR_REDUCTION = 0.0074;
+    public static final double ELEVATOR_MOTOR_REDUCTION = (0.0185185185);
     public static final double L1_POSITION_INCHES = 19;
-    public static final double L2_POSITION_INCHES = 32;
+    public static final double L2_POSITION_INCHES = 6.5;
     public static final double STORED_POSITION = 0;
     public static final double INTAKING_POSITION = 0;
     public static final double PID_ERROR_TOLERANCE = 0;

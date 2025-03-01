@@ -30,7 +30,7 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
 
   private static Elevator m_Instance;
   
-  private double p = 0.01, i = 0, d = 0;
+  private double p = 0.1, i = 0, d = 0;
 
   private ElevatorStates desiredState, currentState = ElevatorStates.IDLE;
 
