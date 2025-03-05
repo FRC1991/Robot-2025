@@ -99,11 +99,15 @@ public class Spitter extends SubsystemBase implements CheckableSubsystem, StateS
       case BROKEN:
         stop();
         break;
-      case RUNNING:
+      case INTAKING:
         motor1.set(SpitterConstants.MOTOR_SPEED);
         motor2.set(-SpitterConstants.MOTOR_SPEED);
         break;
-
+      case SCORING:
+        motor1.set(SpitterConstants.MOTOR_SPEED);
+        motor2.set(-SpitterConstants.MOTOR_SPEED);
+        break;
+                
       default:
         break;
     }
@@ -117,10 +121,12 @@ public class Spitter extends SubsystemBase implements CheckableSubsystem, StateS
         break;
       case BROKEN:
         break;
-      case RUNNING:
+      case INTAKING:
         if(proximitySensor.get()) {
           setDesiredState(SpitterStates.IDLE);
         }
+        break;
+      case SCORING:
         break;
 
       default:
@@ -147,6 +153,7 @@ public class Spitter extends SubsystemBase implements CheckableSubsystem, StateS
   public enum SpitterStates {
     IDLE,
     BROKEN,
-    RUNNING;
+    INTAKING,
+    SCORING;
   }
 }

@@ -50,18 +50,19 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
     motor2.configure(elevatorConfig, ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
 
+    posController = new PIDController(p, i, d);
+    posController.setTolerance(ElevatorConstants.PID_ERROR_TOLERANCE);
+
+    motor1.getEncoder().setPosition(0);
+    motor2.getEncoder().setPosition(0);
+
     ElasticUtil.putDouble("elevator P", () -> this.p, value -> {this.p=value;});
     ElasticUtil.putDouble("elevator I", () -> this.i, value -> {this.i=value;});
     ElasticUtil.putDouble("elevator D", () -> this.d, value -> {this.d=value;});
     ElasticUtil.putDouble("Elevator Position", this::getEncoder);
     ElasticUtil.putDouble("elevator pos 1", motor1.getEncoder()::getPosition);
     ElasticUtil.putDouble("elevator pos 2", motor2.getEncoder()::getPosition);
-
-    posController = new PIDController(p, i, d);
-    posController.setTolerance(ElevatorConstants.PID_ERROR_TOLERANCE);
-
-    motor1.getEncoder().setPosition(0);
-    motor2.getEncoder().setPosition(0);
+    ElasticUtil.putBoolean("elevator at setpoint", this::atSetpoint);
 
     initialized = true;
     status = true;
@@ -90,6 +91,10 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
 
   public double getEncoder() {
     return (motor1.getEncoder().getPosition() - motor2.getEncoder().getPosition()) / 2;
+  }
+
+  public boolean atSetpoint() {
+    return posController.atSetpoint();
   }
 
   @Override

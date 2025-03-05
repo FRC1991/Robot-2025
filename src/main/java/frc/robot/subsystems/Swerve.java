@@ -4,8 +4,6 @@
 
 package frc.robot.subsystems;
 
-import java.util.function.DoubleSupplier;
-
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
@@ -20,11 +18,11 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.CANConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.SwerveConstants;
-import frc.utils.LimelightHelpers;
 import frc.utils.Utils;
 import frc.utils.Utils.ElasticUtil;
 import frc.robot.OI;
@@ -84,8 +82,6 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
   private boolean activelyTurning;
 
   private double p = 0.01, i = 0, d = 0;
-
-  private DoubleSupplier aimingAngle;
 
   // Constructor is private to prevent multiple instances from being made
   private Swerve() {
@@ -151,13 +147,6 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
             m_rearLeft.getPosition(),
             m_rearRight.getPosition()
         });
-  }
-
-  /**
-   * @param getter A method to get the offset from the target in degrees
-  */
-  public void setAngleSupplier(DoubleSupplier getter) {
-    aimingAngle = getter;
   }
 
   /**
@@ -404,7 +393,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
    */
   @Override
   public boolean getInitialized() {
-    return initialized && aimingAngle != null;
+    return initialized;
   }
 
   /**
@@ -418,22 +407,44 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
       case BROKEN:
         break;
       case DRIVE:
-        if(DriverStation.isTeleopEnabled()) {
-          drive(
-              MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftY()), OIConstants.DRIVER_DEADBAND),
-              MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftX()), OIConstants.DRIVER_DEADBAND),
-              MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getRightX()), OIConstants.DRIVER_DEADBAND),
-              true, SwerveConstants.SPEED_SCALE);
-        }
+        drive(
+            MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftY()), OIConstants.DRIVER_DEADBAND),
+            MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftX()), OIConstants.DRIVER_DEADBAND),
+            MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getRightX()), OIConstants.DRIVER_DEADBAND),
+            true, SwerveConstants.SPEED_SCALE);
         break;
       case AIMING:
-        if(DriverStation.isTeleopEnabled()) {
-          drive(
-              LimelightHelpers.getTX("algae") / 29.8,
-              MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftX()), OIConstants.DRIVER_DEADBAND),
-              0,
-              true, SwerveConstants.SPEED_SCALE);
+        switch((int) NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getInteger(-1)) {
+          case 0:
+            angleController.setSetpoint(0);
+            break;
+          case 1:
+            angleController.setSetpoint(45);
+            break;
+          case 2:
+            angleController.setSetpoint(90);
+            break;
+          case 3:
+            angleController.setSetpoint(135);
+            break;
+          case 4:
+            angleController.setSetpoint(180);
+            break;
+          case 5:
+            angleController.setSetpoint(225);
+            break;
+          case 6:
+            angleController.setSetpoint(270);
+            break;
+          case 7:
+            angleController.setSetpoint(315);
+            break;
         }
+        drive(
+            MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftY()), OIConstants.DRIVER_DEADBAND),
+            MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftX()), OIConstants.DRIVER_DEADBAND),
+            0,
+            true, SwerveConstants.SPEED_SCALE);
         break;
       case LOCKED:
         setX();
@@ -463,7 +474,6 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
       case DRIVE:
         break;
       case AIMING:
-        angleController.setSetpoint(90);
         break;
       case LOCKED:
         setX();
@@ -502,7 +512,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
     BROKEN,
     /** Regular control of the robot */
     DRIVE,
-    /** Uses the angle PID controller minimize the offset provided by aimingAngle.
+    /** Aims towards the angle of the April tags around the field.
      * This takes away yaw control from the driver.
      */
     AIMING,

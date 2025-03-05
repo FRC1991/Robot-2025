@@ -125,13 +125,13 @@ public abstract class Constants {
   public static abstract class PivotConstants {
     // These are arbitrary values
     public static final double STORED_POSITION = 0;
-    public static final double SCORING_POSITION = 5;
-    public static final double INTAKE_POSITION = 8;
+    public static final double SCORING_POSITION = 0;
+    public static final double INTAKE_POSITION = 6;
     public static final double PID_ERROR_TOLERANCE = 0;
   }
 
   public static abstract class SpitterConstants {
-    public static final double MOTOR_SPEED = 0.4;
+    public static final double MOTOR_SPEED = 1;
   }
 
   public static abstract class AlgaeConstants {
@@ -141,10 +141,10 @@ public abstract class Constants {
 
   public static abstract class ElevatorConstants {
     public static final double ELEVATOR_MOTOR_REDUCTION = (0.0185185185);
-    public static final double L1_POSITION_INCHES = 1.5;
-    public static final double L2_POSITION_INCHES = 2.3;
+    public static final double L1_POSITION_INCHES = 1.7;
+    public static final double L2_POSITION_INCHES = 2.5;
     public static final double STORED_POSITION = 0;
     public static final double INTAKING_POSITION = 0;
-    public static final double PID_ERROR_TOLERANCE = 0;
+    public static final double PID_ERROR_TOLERANCE = 0.01;
   }
 }
