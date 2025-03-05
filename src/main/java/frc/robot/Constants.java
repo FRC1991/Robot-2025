@@ -108,9 +108,9 @@ public abstract class Constants {
     // Gyro
     public static final int GYRO_ID = 10;
 
-    public static final int SPITTER_MOTOR_ONE_ID = 9990;
-    public static final int SPITTER_MOTOR_TWO_ID = 9991;
-    public static final int PIVOT_ID = 9992;
+    public static final int SPITTER_MOTOR_ONE_ID = 14;
+    public static final int SPITTER_MOTOR_TWO_ID = 15;
+    public static final int PIVOT_ID = 13;
     public static final int ALGAE_INTAKE_ID = 9993;
     public static final int ELEVATOR_MOTOR_ONE_ID = 11;
     public static final int ELEVATOR_MOTOR_TWO_ID = 12;
@@ -131,7 +131,7 @@ public abstract class Constants {
   }
 
   public static abstract class SpitterConstants {
-    public static final double MOTOR_SPEED = 1;
+    public static final double MOTOR_SPEED = 0.4;
   }
 
   public static abstract class AlgaeConstants {
@@ -141,8 +141,8 @@ public abstract class Constants {
 
   public static abstract class ElevatorConstants {
     public static final double ELEVATOR_MOTOR_REDUCTION = (0.0185185185);
-    public static final double L1_POSITION_INCHES = 19;
-    public static final double L2_POSITION_INCHES = 6.5;
+    public static final double L1_POSITION_INCHES = 1.5;
+    public static final double L2_POSITION_INCHES = 2.3;
     public static final double STORED_POSITION = 0;
     public static final double INTAKING_POSITION = 0;
     public static final double PID_ERROR_TOLERANCE = 0;
