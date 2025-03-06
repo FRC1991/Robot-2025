@@ -14,6 +14,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.OI;
 import frc.robot.Constants.CANConstants;
 import frc.robot.Constants.SpitterConstants;
 import frc.utils.Utils.ElasticUtil;
@@ -124,6 +125,7 @@ public class Spitter extends SubsystemBase implements CheckableSubsystem, StateS
       case INTAKING:
         if(proximitySensor.get()) {
           setDesiredState(SpitterStates.IDLE);
+          OI.rumbleControllers();
         }
         break;
       case SCORING:

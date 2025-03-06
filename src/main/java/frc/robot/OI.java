@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OIConstants;
 import frc.utils.Utils;
@@ -17,6 +19,31 @@ public abstract class OI {
   // The Driver's joystick
   public static final CommandXboxController driverController = new CommandXboxController(OIConstants.DRIVER_CONTROLLER_PORT);
   public static final CommandXboxController auxController = new CommandXboxController(OIConstants.AUX_CONTROLLER_PORT);
+
+  // A half second rumble on the aux controller
+  public static void rumbleAuxController() {
+    Thread rumble = new Thread(() -> {
+      auxController.setRumble(RumbleType.kBothRumble, .9);
+      Timer.delay(0.5);
+      auxController.setRumble(RumbleType.kBothRumble, 0);
+    });
+    rumble.start();
+  }
+
+  // A half second rumble on the driver controller
+  public static void rumbleDriverController() {
+    Thread rumble = new Thread(() -> {
+      driverController.setRumble(RumbleType.kBothRumble, .9);
+      Timer.delay(0.5);
+      driverController.setRumble(RumbleType.kBothRumble, 0);
+    });
+    rumble.start();
+  }
+
+  public static void rumbleControllers() {
+    rumbleAuxController();
+    rumbleDriverController();
+  }
 
   public static double[] getMappedJoysticks() {
     // Convert XY to polar for mapping
