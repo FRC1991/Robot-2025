@@ -9,14 +9,12 @@ import frc.robot.subsystems.AlgaeIntake.AlgaeStates;
 import frc.robot.subsystems.Elevator.ElevatorStates;
 import frc.robot.subsystems.Pivot.PivotStates;
 import frc.robot.subsystems.Spitter.SpitterStates;
-import frc.robot.subsystems.Swerve.SwerveStates;
 
 public class Manager extends SubsystemBase implements CheckableSubsystem, StateSubsystem {
 
   private boolean status = false;
   private boolean initialized = false;
 
-  private Swerve swerve = Swerve.getInstance();
   private Spitter spitter = Spitter.getInstance();
   private Pivot pivot = Pivot.getInstance();
   private Elevator elevator = Elevator.getInstance();
@@ -27,7 +25,6 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
   /** Creates a new Manager. */
   public Manager() {
     // All subsystems should initialize when calling getInstance()
-    initialized = swerve.getInitialized();
     initialized &= spitter.getInitialized();
     initialized &= pivot.getInitialized();
     initialized &= elevator.getInitialized();
@@ -39,7 +36,6 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
    */
   @Override
   public void stop() {
-    swerve.stop();
     spitter.stop();
     pivot.stop();
     elevator.stop();
@@ -59,8 +55,7 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
    */
   @Override
   public boolean checkSubsystem() {
-    status = swerve.checkSubsystem();
-    status &= spitter.checkSubsystem();
+    status = spitter.checkSubsystem();
     status &= pivot.checkSubsystem();
     status &= elevator.checkSubsystem();
     status &= algaeIntake.checkSubsystem();
@@ -73,7 +68,6 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
    */
   @Override
   public void update() {
-    swerve.update();
     spitter.update();
     pivot.update();
     elevator.update();
@@ -85,8 +79,6 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
         setDesiredState(ManagerStates.DRIVE);
         break;
       case DRIVE:
-        break;
-      case LOCKED:
         break;
       case ALGAE_INTAKE:
         break;
@@ -118,56 +110,42 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
   public void handleStateTransition() {
     switch(desiredState) {
       case IDLE:
-        swerve.setDesiredState(SwerveStates.IDLE);
         spitter.setDesiredState(SpitterStates.IDLE);
         pivot.setDesiredState(PivotStates.IDLE);
         elevator.setDesiredState(ElevatorStates.IDLE);
         algaeIntake.setDesiredState(AlgaeStates.IDLE);
         break;
       case DRIVE:
-        swerve.setDesiredState(SwerveStates.DRIVE);
-        spitter.setDesiredState(SpitterStates.IDLE);
-        pivot.setDesiredState(PivotStates.STORED);
-        elevator.setDesiredState(ElevatorStates.STORED);
-        algaeIntake.setDesiredState(AlgaeStates.IDLE);
-        break;
-      case LOCKED:
-        swerve.setDesiredState(SwerveStates.LOCKED);
         spitter.setDesiredState(SpitterStates.IDLE);
         pivot.setDesiredState(PivotStates.STORED);
         elevator.setDesiredState(ElevatorStates.STORED);
         algaeIntake.setDesiredState(AlgaeStates.IDLE);
         break;
       case ALGAE_INTAKE:
-        swerve.setDesiredState(SwerveStates.DRIVE);
         spitter.setDesiredState(SpitterStates.IDLE);
         pivot.setDesiredState(PivotStates.INTAKING);
         elevator.setDesiredState(ElevatorStates.STORED);
         algaeIntake.setDesiredState(AlgaeStates.INTAKING);
         break;
       case ALGAE_SCORE:
-        swerve.setDesiredState(SwerveStates.DRIVE);
         spitter.setDesiredState(SpitterStates.IDLE);
         pivot.setDesiredState(PivotStates.SCORING);
         elevator.setDesiredState(ElevatorStates.STORED);
         algaeIntake.setDesiredState(AlgaeStates.SCORING);
         break;
       case CORAL_INTAKE:
-        swerve.setDesiredState(SwerveStates.DRIVE);
         spitter.setDesiredState(SpitterStates.INTAKING);
         pivot.setDesiredState(PivotStates.STORED);
         elevator.setDesiredState(ElevatorStates.INTAKING);
         algaeIntake.setDesiredState(AlgaeStates.IDLE);
         break;
       case CORAL_L1:
-        swerve.setDesiredState(SwerveStates.DRIVE);
         spitter.setDesiredState(SpitterStates.IDLE);
         pivot.setDesiredState(PivotStates.STORED);
         elevator.setDesiredState(ElevatorStates.L1);
         algaeIntake.setDesiredState(AlgaeStates.IDLE);
         break;
       case CORAL_L2:
-        swerve.setDesiredState(SwerveStates.DRIVE);
         spitter.setDesiredState(SpitterStates.IDLE);
         pivot.setDesiredState(PivotStates.STORED);
         elevator.setDesiredState(ElevatorStates.L2);
@@ -220,8 +198,6 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
     IDLE,
     /** Just driving the robot around */
     DRIVE,
-    /** Locking the wheels in an X formation */
-    LOCKED,
     /** Running the AlgaeIntake to pull an Agae into our robot */
     ALGAE_INTAKE,
     /** Pushing the Algae out of our robot and into the processor */

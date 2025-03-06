@@ -17,6 +17,7 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Manager;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Manager.ManagerStates;
+import frc.robot.subsystems.Swerve.SwerveStates;
 import frc.robot.subsystems.Pivot;
 import frc.robot.subsystems.Spitter;
 import frc.utils.Utils.ElasticUtil;
@@ -50,35 +51,41 @@ public class RobotContainer {
 
   private void configureBindings() {
     m_Manager.setDefaultCommand(new RunCommand(() -> m_Manager.update(), m_Manager));
+    Swerve.getInstance().setDefaultCommand(new RunCommand(() -> Swerve.getInstance().update(), Swerve.getInstance()));
 
-    OI.driverController.y()
+    OI.auxController.y()
         .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.CORAL_L1), m_Manager))
         .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
     
-    OI.driverController.b()
+    OI.auxController.b()
         .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.CORAL_L2), m_Manager))
         .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
 
-    OI.driverController.x()
+    OI.auxController.x()
         .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.CORAL_INTAKE), m_Manager))
         .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
     
-    OI.driverController.rightBumper()
+    OI.auxController.rightBumper()
         .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.ALGAE_SCORE), m_Manager))
         .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
 
-    OI.driverController.leftBumper()
+    OI.auxController.leftBumper()
         .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.ALGAE_INTAKE), m_Manager))
         .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
     
     // Stops movement by setting the wheels in an X formation
-    OI.driverController.a()
-        .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.LOCKED), m_Manager))
-        .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
+    OI.driverController.rightBumper()
+        .onTrue(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.LOCKED), Swerve.getInstance()))
+        .onFalse(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.DRIVE), Swerve.getInstance()));
     
+    // Removes yaw control and aligns to April tags
+    OI.driverController.a()
+        .onTrue(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.AIMING), Swerve.getInstance()))
+        .onFalse(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.DRIVE), Swerve.getInstance()));
+        
     // Zeroes out the gyro
     OI.driverController.start()
-      .onTrue(new InstantCommand(() -> Swerve.getInstance().zeroHeading(), m_Manager));
+        .onTrue(new InstantCommand(() -> Swerve.getInstance().zeroHeading(), Swerve.getInstance()));
   }
 
   public Command getAutonomousCommand() {

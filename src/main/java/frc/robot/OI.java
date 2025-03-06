@@ -16,7 +16,7 @@ public abstract class OI {
 
   // The Driver's joystick
   public static final CommandXboxController driverController = new CommandXboxController(OIConstants.DRIVER_CONTROLLER_PORT);
-  public static final CommandXboxController aux = new CommandXboxController(1);
+  public static final CommandXboxController auxController = new CommandXboxController(OIConstants.AUX_CONTROLLER_PORT);
 
   public static double[] getMappedJoysticks() {
     // Convert XY to polar for mapping

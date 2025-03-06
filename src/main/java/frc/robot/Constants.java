@@ -119,6 +119,7 @@ public abstract class Constants {
 
   public static abstract class OIConstants {
     public static final int DRIVER_CONTROLLER_PORT = 0;
+    public static final int AUX_CONTROLLER_PORT = 1;
     public static final double DRIVER_DEADBAND = 0.07;
   }
 
