@@ -446,6 +446,8 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
             0,
             true, SwerveConstants.SPEED_SCALE);
         break;
+      case ALIGNING:
+        break;
       case LOCKED:
         setX();
         break;
@@ -474,6 +476,8 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
       case DRIVE:
         break;
       case AIMING:
+        break;
+      case ALIGNING:
         break;
       case LOCKED:
         setX();
@@ -516,6 +520,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
      * This takes away yaw control from the driver.
      */
     AIMING,
+    ALIGNING,
     /** Removes all control and locks the wheels in an X formation */
     LOCKED;
   }
