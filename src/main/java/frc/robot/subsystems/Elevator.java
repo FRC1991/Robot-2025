@@ -29,8 +29,6 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
   private PIDController posController;
 
   private static Elevator m_Instance;
-  
-  private double p = 2, i = 0, d = 0;
 
   private ElevatorStates desiredState, currentState = ElevatorStates.IDLE;
 
@@ -50,15 +48,12 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
     motor2.configure(elevatorConfig, ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
 
-    posController = new PIDController(p, i, d);
+    posController = new PIDController(2, 0, 0);
     posController.setTolerance(ElevatorConstants.PID_ERROR_TOLERANCE);
 
     motor1.getEncoder().setPosition(0);
     motor2.getEncoder().setPosition(0);
 
-    ElasticUtil.putDouble("elevator P", () -> this.p, value -> {this.p=value;});
-    ElasticUtil.putDouble("elevator I", () -> this.i, value -> {this.i=value;});
-    ElasticUtil.putDouble("elevator D", () -> this.d, value -> {this.d=value;});
     ElasticUtil.putDouble("Elevator Position", this::getEncoder);
     ElasticUtil.putDouble("elevator pos 1", motor1.getEncoder()::getPosition);
     ElasticUtil.putDouble("elevator pos 2", motor2.getEncoder()::getPosition);
@@ -146,8 +141,6 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
   }
 
   public void update() {
-    posController.setPID(p, i, d);
-
     switch(currentState) {
       case IDLE:
         break;

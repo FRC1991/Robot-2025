@@ -94,7 +94,7 @@ public class RobotContainer {
         
     // Zeroes out the gyro
     OI.driverController.start()
-        .onTrue(new InstantCommand(() -> Swerve.getInstance().zeroHeading(), Swerve.getInstance()));
+        .onTrue(new InstantCommand(() -> Swerve.getInstance().setHeading(0), Swerve.getInstance()));
   }
 
   public Command getAutonomousCommand() {

@@ -123,7 +123,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
         this // Reference to this subsystem to set requirements
     );
 
-    zeroHeading();
+    setHeading(0);
   }
 
   /**
@@ -327,9 +327,9 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
   }
 
   /** Zeroes the heading of the robot. */
-  public void zeroHeading() {
-    m_gyro.setYaw(0);
-    desiredHeading = 0;
+  public void setHeading(double heading) {
+    m_gyro.setYaw(heading);
+    desiredHeading = heading;
   }
 
   public void setDesiredHeading(double heading) {
