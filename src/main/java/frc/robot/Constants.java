@@ -26,6 +26,7 @@ public abstract class Constants {
   public static final double APRILTAG_HEIGHT = 0;
   public static final int NEO_CURRENT_LIMIT = 40;
   public static final int CURRENT_LIMIT_550 = 30;
+  public static final String LIMELIGHT_NAME = "elevator";
 
   public static abstract class SwerveConstants {
     public static final RobotConfig PP_CONFIG = new RobotConfig(

@@ -23,8 +23,10 @@ import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.CANConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.SwerveConstants;
+import frc.utils.LimelightHelpers;
 import frc.utils.Utils;
 import frc.utils.Utils.ElasticUtil;
+import frc.robot.Constants;
 import frc.robot.OI;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -80,6 +82,8 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
   private double desiredHeading;
   private PIDController angleController = new PIDController(0, 0, 0);
   private boolean activelyTurning;
+  
+  private PIDController alignmentController = new PIDController(0.01, 0, 0);
 
   private double p = 0.01, i = 0, d = 0;
 
@@ -97,6 +101,8 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
     angleController.setTolerance(2);
     angleController.enableContinuousInput(0, 360);
     angleController.setPID(p, i, d);
+
+    alignmentController.setTolerance(0.5);
 
     // Configure AutoBuilder last
     AutoBuilder.configure(
@@ -414,7 +420,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
             true, SwerveConstants.SPEED_SCALE);
         break;
       case AIMING:
-        switch((int) NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getInteger(-1)) {
+        switch((int) NetworkTableInstance.getDefault().getTable(Constants.LIMELIGHT_NAME).getEntry("tid").getInteger(-1)) {
           case 0:
             angleController.setSetpoint(0);
             break;
@@ -447,6 +453,20 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
             true, SwerveConstants.SPEED_SCALE);
         break;
       case ALIGNING:
+        double tx = LimelightHelpers.getTX(Constants.LIMELIGHT_NAME);
+        if(tx > 0) {
+          drive(
+              alignmentController.calculate(tx, 20),
+              0,
+              0,
+              false, SwerveConstants.SPEED_SCALE);
+        } else {
+          drive(
+              alignmentController.calculate(tx, -20),
+              0,
+              0,
+              false, SwerveConstants.SPEED_SCALE);
+        }
         break;
       case LOCKED:
         setX();
