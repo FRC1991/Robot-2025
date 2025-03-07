@@ -453,20 +453,11 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
             true, SwerveConstants.SPEED_SCALE);
         break;
       case ALIGNING:
-        double tx = LimelightHelpers.getTX(Constants.LIMELIGHT_NAME);
-        if(tx > 0) {
-          drive(
-              alignmentController.calculate(tx, 20),
-              0,
-              0,
-              false, SwerveConstants.SPEED_SCALE);
-        } else {
-          drive(
-              alignmentController.calculate(tx, -20),
-              0,
-              0,
-              false, SwerveConstants.SPEED_SCALE);
-        }
+        drive(
+            alignmentController.calculate(LimelightHelpers.getTX(Constants.LIMELIGHT_NAME), 0),
+            0,
+            0,
+            false, SwerveConstants.SPEED_SCALE);
         break;
       case LOCKED:
         setX();

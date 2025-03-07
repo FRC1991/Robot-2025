@@ -101,12 +101,12 @@ public class Spitter extends SubsystemBase implements CheckableSubsystem, StateS
         stop();
         break;
       case INTAKING:
-        motor1.set(SpitterConstants.MOTOR_SPEED);
-        motor2.set(-SpitterConstants.MOTOR_SPEED);
+        motor1.set(SpitterConstants.INTAKE_SPEED);
+        motor2.set(-SpitterConstants.INTAKE_SPEED);
         break;
       case SCORING:
-        motor1.set(SpitterConstants.MOTOR_SPEED);
-        motor2.set(-SpitterConstants.MOTOR_SPEED);
+        motor1.set(0.98*SpitterConstants.SCORE_SPEED);
+        motor2.set(-SpitterConstants.SCORE_SPEED);
         break;
                 
       default:

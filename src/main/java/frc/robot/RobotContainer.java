@@ -26,23 +26,18 @@ import frc.utils.Utils.ElasticUtil;
 
 public class RobotContainer {
 
-  private final SendableChooser<Command> autoChooser;
+  private SendableChooser<Command> autoChooser;
 
   private final Manager m_Manager = new Manager();
 
   public RobotContainer() {
-    // This would throw an error no matter what
-    // in last year's code, so let's hope for better
-    // this year.
-    autoChooser = AutoBuilder.buildAutoChooser();
-
     NamedCommands.registerCommand("CORAL_L2", new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.CORAL_L2), m_Manager));
     NamedCommands.registerCommand("DRIVE", new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
     NamedCommands.registerCommand("ALGAE_SCORE", new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.ALGAE_SCORE), m_Manager));
     NamedCommands.registerCommand("IDLE", new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.IDLE), m_Manager));
 
-    configureElastic();
     configureBindings();
+    configureElastic();
   }
 
   private void configureElastic() {
@@ -55,6 +50,10 @@ public class RobotContainer {
     ElasticUtil.putString("Elevator State", () -> Elevator.getInstance().getState().toString());
     ElasticUtil.putString("AlgaeIntake State", () -> AlgaeIntake.getInstance().getState().toString());
 
+    // This would throw an error no matter what
+    // in last year's code, so let's hope for better
+    // this year.
+    autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData(autoChooser);
   }
 
@@ -90,6 +89,10 @@ public class RobotContainer {
     // Removes yaw control and aligns to April tags
     OI.driverController.a()
         .onTrue(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.AIMING), Swerve.getInstance()))
+        .onFalse(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.DRIVE), Swerve.getInstance()));
+
+    OI.driverController.x()
+        .onTrue(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.ALIGNING), Swerve.getInstance()))
         .onFalse(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.DRIVE), Swerve.getInstance()));
         
     // Zeroes out the gyro

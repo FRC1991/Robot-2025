@@ -112,7 +112,7 @@ public abstract class Constants {
     public static final int SPITTER_MOTOR_ONE_ID = 14;
     public static final int SPITTER_MOTOR_TWO_ID = 15;
     public static final int PIVOT_ID = 13;
-    public static final int ALGAE_INTAKE_ID = 9993;
+    public static final int ALGAE_INTAKE_ID = 16;
     public static final int ELEVATOR_MOTOR_ONE_ID = 11;
     public static final int ELEVATOR_MOTOR_TWO_ID = 12;
     public static final int FLIPPER_ID = 9996;
@@ -133,11 +133,12 @@ public abstract class Constants {
   }
 
   public static abstract class SpitterConstants {
-    public static final double MOTOR_SPEED = 1;
+    public static final double SCORE_SPEED = 1;
+    public static final double INTAKE_SPEED = 0.5;
   }
 
   public static abstract class AlgaeConstants {
-    public static final double INTAKE_SPEED = 1;
+    public static final double INTAKE_SPEED = 0.7;
     public static final double SCORING_SPEED = -1;
   }
 
@@ -147,6 +148,6 @@ public abstract class Constants {
     public static final double L2_POSITION_INCHES = 2.5;
     public static final double STORED_POSITION = 0;
     public static final double INTAKING_POSITION = 0;
-    public static final double PID_ERROR_TOLERANCE = 0.01;
+    public static final double PID_ERROR_TOLERANCE = 0.02;
   }
 }
