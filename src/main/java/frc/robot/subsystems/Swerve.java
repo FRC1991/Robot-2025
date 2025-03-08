@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.MathUtil;
@@ -104,30 +105,36 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
 
     alignmentController.setTolerance(0.5);
 
-    // Configure AutoBuilder last
-    AutoBuilder.configure(
-        this::getPose, // Robot pose supplier
-        this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
-        this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-        (speeds, feedforwards) -> drive(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
-        new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-            new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-            new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
-        ),
-        SwerveConstants.PP_CONFIG, // The robot configuration
-        () -> {
-          // Boolean supplier that controls when the path will be mirrored for the red alliance
-          // This will flip the path being followed to the red side of the field.
-          // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+    try {
+      RobotConfig PP_CONFIG = RobotConfig.fromGUISettings();
 
-          var alliance = DriverStation.getAlliance();
-          if (alliance.isPresent()) {
-            return alliance.get() == DriverStation.Alliance.Red;
-          }
-          return false;
-        },
-        this // Reference to this subsystem to set requirements
-    );
+      // Configure AutoBuilder last
+      AutoBuilder.configure(
+          this::getPose, // Robot pose supplier
+          this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
+          this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+          (speeds, feedforwards) -> drive(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
+          new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
+              new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+              new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+          ),
+          PP_CONFIG, // The robot configuration
+          () -> {
+            // Boolean supplier that controls when the path will be mirrored for the red alliance
+            // This will flip the path being followed to the red side of the field.
+            // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+            var alliance = DriverStation.getAlliance();
+            if (alliance.isPresent()) {
+              return alliance.get() == DriverStation.Alliance.Red;
+            }
+            return false;
+          },
+          this // Reference to this subsystem to set requirements
+      );
+    } catch (Exception e) {
+
+    }
 
     setHeading(0);
   }
@@ -212,11 +219,15 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
    * @param t ChassisSpeeds relative to the robot
    */
   private void drive(ChassisSpeeds t) {
-    var swerveModuleStates = SwerveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(t);
-    m_frontLeft.setDesiredState(swerveModuleStates[0]);
-    m_frontRight.setDesiredState(swerveModuleStates[1]);
-    m_rearLeft.setDesiredState(swerveModuleStates[2]);
-    m_rearRight.setDesiredState(swerveModuleStates[3]);
+    // var swerveModuleStates = SwerveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(t);
+    drive(t.vxMetersPerSecond, t.vyMetersPerSecond, t.omegaRadiansPerSecond, false);
+    System.out.println("vx: " + t.vxMetersPerSecond);
+    System.out.println("vy: " + t.vyMetersPerSecond);
+    System.out.println("vr: " + t.omegaRadiansPerSecond);
+    // m_frontLeft.setDesiredState(swerveModuleStates[0]);
+    // m_frontRight.setDesiredState(swerveModuleStates[1]);
+    // m_rearLeft.setDesiredState(swerveModuleStates[2]);
+    // m_rearRight.setDesiredState(swerveModuleStates[3]);
   }
 
   /**
@@ -454,10 +465,17 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
         break;
       case ALIGNING:
         drive(
+            0,
             alignmentController.calculate(LimelightHelpers.getTX(Constants.LIMELIGHT_NAME), 0),
             0,
-            0,
             false, SwerveConstants.SPEED_SCALE);
+        break;
+      case MANUAL:
+        drive(
+            MathUtil.applyDeadband(OI.mappingFunction(-OI.driverController.getLeftY()), OIConstants.DRIVER_DEADBAND),
+            MathUtil.applyDeadband(OI.mappingFunction(-OI.driverController.getLeftX()), OIConstants.DRIVER_DEADBAND),
+            MathUtil.applyDeadband(OI.mappingFunction(-OI.driverController.getRightX()), OIConstants.DRIVER_DEADBAND),
+            false, SwerveConstants.LINE_UP_SPEED_SCALE);
         break;
       case LOCKED:
         setX();
@@ -489,6 +507,8 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
       case AIMING:
         break;
       case ALIGNING:
+        break;
+      case MANUAL:
         break;
       case LOCKED:
         setX();
@@ -532,6 +552,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
      */
     AIMING,
     ALIGNING,
+    MANUAL,
     /** Removes all control and locks the wheels in an X formation */
     LOCKED;
   }

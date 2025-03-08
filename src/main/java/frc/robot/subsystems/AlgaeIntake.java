@@ -34,7 +34,7 @@ public class AlgaeIntake extends SubsystemBase implements CheckableSubsystem, St
 
     SparkMaxConfig algaeIntakeConfig = new SparkMaxConfig();
 
-    algaeIntakeConfig.idleMode(IdleMode.kCoast)
+    algaeIntakeConfig.idleMode(IdleMode.kBrake)
         .smartCurrentLimit(Constants.CURRENT_LIMIT_550);
 
     motor.configure(algaeIntakeConfig, ResetMode.kResetSafeParameters,

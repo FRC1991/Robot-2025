@@ -6,6 +6,8 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -27,6 +29,7 @@ import frc.utils.Utils.ElasticUtil;
 public class RobotContainer {
 
   private SendableChooser<Command> autoChooser;
+//   private SendableChooser<Command> autoTwo;
 
   private final Manager m_Manager = new Manager();
 
@@ -54,12 +57,19 @@ public class RobotContainer {
     // in last year's code, so let's hope for better
     // this year.
     autoChooser = AutoBuilder.buildAutoChooser();
-    SmartDashboard.putData(autoChooser);
+    SmartDashboard.putData("pathplanner chooser", autoChooser);
+
+    // autoTwo = new SendableChooser<Command>();
+    // autoTwo.addOption("leave B auto", new PathPlannerAuto("Leave(B)-a"));
+    // autoTwo.addOption("leave B path", PathPlannerPath.fromPathFile("Leave(B)"));
+    // SmartDashboard.putData("manual chooser", autoTwo);
   }
 
   private void configureBindings() {
     m_Manager.setDefaultCommand(new RunCommand(() -> m_Manager.update(), m_Manager));
     Swerve.getInstance().setDefaultCommand(new RunCommand(() -> Swerve.getInstance().update(), Swerve.getInstance()));
+    Swerve.getInstance().setDesiredState(SwerveStates.DRIVE);
+    m_Manager.setDesiredState(ManagerStates.DRIVE);
 
     OI.auxController.y()
         .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.CORAL_L1), m_Manager))
@@ -94,7 +104,11 @@ public class RobotContainer {
     OI.driverController.x()
         .onTrue(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.ALIGNING), Swerve.getInstance()))
         .onFalse(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.DRIVE), Swerve.getInstance()));
-        
+
+    OI.driverController.leftBumper()
+        .onTrue(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.MANUAL), Swerve.getInstance()))
+        .onFalse(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.DRIVE), Swerve.getInstance()));
+    
     // Zeroes out the gyro
     OI.driverController.start()
         .onTrue(new InstantCommand(() -> Swerve.getInstance().setHeading(0), Swerve.getInstance()));
