@@ -86,7 +86,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
   
   private PIDController alignmentController = new PIDController(0.01, 0, 0);
 
-  private double p = 0.01, i = 0, d = 0;
+  private double p = 0.02, i = 0, d = 0;
 
   // Constructor is private to prevent multiple instances from being made
   private Swerve() {
@@ -199,7 +199,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
   /**
    * Resets the odometry to 0 degrees and 0 velocity
    */
-  public void resetOdometry() {
+  public void resetOdometryZero() {
     resetOdometry(new Pose2d(0, 0, new Rotation2d(0)));
   }
 
@@ -209,7 +209,21 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
    * @return The ChassisSpeeds relative to the robot
    */
   private ChassisSpeeds getRobotRelativeSpeeds() {
+    m_RobotChassisSpeeds = SwerveConstants.DRIVE_KINEMATICS.toChassisSpeeds(
+      m_frontLeft.getState(),
+      m_frontRight.getState(),
+      m_rearLeft.getState(),
+      m_rearRight.getState()
+    );
     return m_RobotChassisSpeeds;
+  }
+
+  /**
+   * 
+   * @return distance the wheels have traveled in meters
+   */
+  public double getDistanceTraveledStraight() {
+    return Math.abs(m_frontLeft.getPosition().distanceMeters);
   }
 
   /**
@@ -221,9 +235,6 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
   private void drive(ChassisSpeeds t) {
     // var swerveModuleStates = SwerveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(t);
     drive(t.vxMetersPerSecond, t.vyMetersPerSecond, t.omegaRadiansPerSecond, false);
-    System.out.println("vx: " + t.vxMetersPerSecond);
-    System.out.println("vy: " + t.vyMetersPerSecond);
-    System.out.println("vr: " + t.omegaRadiansPerSecond);
     // m_frontLeft.setDesiredState(swerveModuleStates[0]);
     // m_frontRight.setDesiredState(swerveModuleStates[1]);
     // m_rearLeft.setDesiredState(swerveModuleStates[2]);
@@ -244,17 +255,17 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
     double xSpeedDelivered = xSpeed * SwerveConstants.MAX_SPEED_METERS_PER_SECOND;
     double ySpeedDelivered = ySpeed * SwerveConstants.MAX_SPEED_METERS_PER_SECOND;
     
-    if(activelyTurning) {
-      desiredHeading = desiredHeading - (rot * SwerveConstants.MAX_DEGREES_PER_SCHEDULER_LOOP);
-    } else if(rot != 0) {
-      desiredHeading = getHeading() - (rot * SwerveConstants.MAX_DEGREES_PER_SCHEDULER_LOOP);
-    } else {}
+    // if(activelyTurning) {
+    //   desiredHeading = desiredHeading - (rot * SwerveConstants.MAX_DEGREES_PER_SCHEDULER_LOOP);
+    // } else if(rot != 0) {
+    //   desiredHeading = getHeading() - (rot * SwerveConstants.MAX_DEGREES_PER_SCHEDULER_LOOP);
+    // } else {}
 
-    desiredHeading = MathUtil.inputModulus(desiredHeading, 0, 360);
+    // desiredHeading = MathUtil.inputModulus(desiredHeading, 0, 360);
 
-    angleController.setPID(p, i, d);
+    // angleController.setPID(p, i, d);
 
-    double rotDelivered = Utils.normalize(angleController.calculate(getHeading(), desiredHeading)) * SwerveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
+    double rotDelivered = 0.7 * rot * SwerveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND * -1;
 
     rotDelivered = rotDelivered * (SwerveConstants.GYRO_REVERSED ? -1 : 1);
 
@@ -420,6 +431,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
   public void update() {
     switch(currentState) {
       case IDLE:
+        setDesiredState(SwerveStates.DRIVE);
         break;
       case BROKEN:
         break;

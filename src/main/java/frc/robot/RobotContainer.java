@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Manager;
@@ -57,8 +58,22 @@ public class RobotContainer {
     // in last year's code, so let's hope for better
     // this year.
     autoChooser = AutoBuilder.buildAutoChooser();
-    SmartDashboard.putData("pathplanner chooser", autoChooser);
 
+    RunCommand leave = new RunCommand(() -> Swerve.getInstance().drive(0.5, 0, 0, false), Swerve.getInstance());
+    autoChooser.addOption("leave thing", leave);
+
+    SequentialCommandGroup coralOne = new SequentialCommandGroup(
+        new RunCommand(
+            () -> Swerve.getInstance().drive(0.8, 0, 0, false), Swerve.getInstance()
+        ).withTimeout(3),
+        new InstantCommand(
+            () -> m_Manager.setDesiredState(ManagerStates.CORAL_L2), m_Manager
+        ).withTimeout(5)
+    );
+    autoChooser.addOption("coral uno por favor", coralOne);
+
+    SmartDashboard.putData("pathplanner chooser", autoChooser);
+    
     // autoTwo = new SendableChooser<Command>();
     // autoTwo.addOption("leave B auto", new PathPlannerAuto("Leave(B)-a"));
     // autoTwo.addOption("leave B path", PathPlannerPath.fromPathFile("Leave(B)"));
@@ -68,8 +83,8 @@ public class RobotContainer {
   private void configureBindings() {
     m_Manager.setDefaultCommand(new RunCommand(() -> m_Manager.update(), m_Manager));
     Swerve.getInstance().setDefaultCommand(new RunCommand(() -> Swerve.getInstance().update(), Swerve.getInstance()));
-    Swerve.getInstance().setDesiredState(SwerveStates.DRIVE);
-    m_Manager.setDesiredState(ManagerStates.DRIVE);
+    // Swerve.getInstance().setDesiredState(SwerveStates.DRIVE);
+    // m_Manager.setDesiredState(ManagerStates.DRIVE);
 
     OI.auxController.y()
         .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.CORAL_L1), m_Manager))
