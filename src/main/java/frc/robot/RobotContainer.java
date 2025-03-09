@@ -4,11 +4,14 @@
 
 package frc.robot;
 
+import org.opencv.features2d.AgastFeatureDetector;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -22,6 +25,7 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Manager;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Manager.ManagerStates;
+import frc.robot.subsystems.Pivot.PivotStates;
 import frc.robot.subsystems.Swerve.SwerveStates;
 import frc.robot.subsystems.Pivot;
 import frc.robot.subsystems.Spitter;
@@ -83,12 +87,18 @@ public class RobotContainer {
   private void configureBindings() {
     m_Manager.setDefaultCommand(new RunCommand(() -> m_Manager.update(), m_Manager));
     Swerve.getInstance().setDefaultCommand(new RunCommand(() -> Swerve.getInstance().update(), Swerve.getInstance()));
+
+    Pivot.getInstance().setDefaultCommand(new RunCommand(() -> Pivot.getInstance().motor.set(MathUtil.applyDeadband(-OI.auxController.getRightY(), 0.07)), Pivot.getInstance()));
+
+    OI.auxController.y()
+        .onTrue(new InstantCommand(() -> Pivot.getInstance().motor.getEncoder().setPosition(0)));
+
     // Swerve.getInstance().setDesiredState(SwerveStates.DRIVE);
     // m_Manager.setDesiredState(ManagerStates.DRIVE);
 
-    OI.auxController.y()
-        .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.CORAL_L1), m_Manager))
-        .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
+    // OI.auxController.y()
+    //     .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.CORAL_L1), m_Manager))
+    //     .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
     
     OI.auxController.b()
         .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.CORAL_L2), m_Manager))
@@ -112,11 +122,11 @@ public class RobotContainer {
         .onFalse(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.DRIVE), Swerve.getInstance()));
     
     // Removes yaw control and aligns to April tags
-    OI.driverController.a()
-        .onTrue(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.AIMING), Swerve.getInstance()))
-        .onFalse(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.DRIVE), Swerve.getInstance()));
+    // OI.driverController.a()
+    //     .onTrue(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.AIMING), Swerve.getInstance()))
+    //     .onFalse(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.DRIVE), Swerve.getInstance()));
 
-    OI.driverController.x()
+    OI.driverController.a()
         .onTrue(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.ALIGNING), Swerve.getInstance()))
         .onFalse(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.DRIVE), Swerve.getInstance()));
 

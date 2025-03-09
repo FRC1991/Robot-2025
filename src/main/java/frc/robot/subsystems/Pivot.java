@@ -25,7 +25,7 @@ public class Pivot extends SubsystemBase implements CheckableSubsystem, StateSub
   private boolean status = false;
   private boolean initialized = false;
 
-  private SparkMax motor;
+  public SparkMax motor;
 
   private PIDController posController;
 

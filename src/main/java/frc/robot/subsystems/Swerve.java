@@ -103,7 +103,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
     angleController.enableContinuousInput(0, 360);
     angleController.setPID(p, i, d);
 
-    alignmentController.setTolerance(0.5);
+    alignmentController.setTolerance(1);
 
     try {
       RobotConfig PP_CONFIG = RobotConfig.fromGUISettings();
@@ -477,17 +477,17 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
         break;
       case ALIGNING:
         drive(
-            0,
-            alignmentController.calculate(LimelightHelpers.getTX(Constants.LIMELIGHT_NAME), 0),
-            0,
-            false, SwerveConstants.SPEED_SCALE);
+            -alignmentController.calculate(LimelightHelpers.getTX(Constants.LIMELIGHT_NAME), 0),
+            MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftX()), OIConstants.DRIVER_DEADBAND),
+            -angleController.calculate(getHeading(), 270),
+            true, 0.8);
         break;
       case MANUAL:
         drive(
-            MathUtil.applyDeadband(OI.mappingFunction(-OI.driverController.getLeftY()), OIConstants.DRIVER_DEADBAND),
-            MathUtil.applyDeadband(OI.mappingFunction(-OI.driverController.getLeftX()), OIConstants.DRIVER_DEADBAND),
-            MathUtil.applyDeadband(OI.mappingFunction(-OI.driverController.getRightX()), OIConstants.DRIVER_DEADBAND),
-            false, SwerveConstants.LINE_UP_SPEED_SCALE);
+            MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftY()), OIConstants.DRIVER_DEADBAND),
+            MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftX()), OIConstants.DRIVER_DEADBAND),
+            -angleController.calculate(getHeading(), 270),
+            true, SwerveConstants.SPEED_SCALE);
         break;
       case LOCKED:
         setX();

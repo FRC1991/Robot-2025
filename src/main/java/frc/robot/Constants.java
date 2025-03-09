@@ -22,7 +22,7 @@ public abstract class Constants {
   public static final double APRILTAG_HEIGHT = 0;
   public static final int NEO_CURRENT_LIMIT = 40;
   public static final int CURRENT_LIMIT_550 = 30;
-  public static final String LIMELIGHT_NAME = "limelight-shooter";
+  public static final String LIMELIGHT_NAME = "limelight-intake";
 
   public static abstract class SwerveConstants {
     // The speed modifier for the swerve drive as a percent
