@@ -24,6 +24,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import frc.robot.Constants.ModuleConstants;
 import frc.robot.Constants.SwerveConstants;
 import frc.utils.Utils;
+import frc.utils.Utils.ElasticUtil;
 
 public class SwerveModule implements CheckableSubsystem {
   private boolean status = false;
@@ -68,6 +69,10 @@ public class SwerveModule implements CheckableSubsystem {
 
     driveTalonConfig.TorqueCurrent.PeakForwardTorqueCurrent = 80.0;
     driveTalonConfig.TorqueCurrent.PeakReverseTorqueCurrent = -80.0;
+    driveTalonConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    driveTalonConfig.CurrentLimits.SupplyCurrentLimit = 55;
+    driveTalonConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    driveTalonConfig.CurrentLimits.StatorCurrentLimit = 70;
     driveTalonConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.02;
     driveTalonConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     driveTalonConfig.Feedback.SensorToMechanismRatio = drivingFactor;
@@ -91,6 +96,7 @@ public class SwerveModule implements CheckableSubsystem {
     turningMotor.configure(turningConfig, ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
     turningMotor.getEncoder().setPosition(m_turningEncoder.get());
+    ElasticUtil.putDouble("encoder " + encoderChannel, m_turningEncoder::get);
 
     m_chassisAngularOffset = chassisAngularOffset;
     m_desiredState.angle = new Rotation2d(getEncoderRadians());

@@ -42,7 +42,7 @@ public abstract class Constants {
 
     // Angular offsets of the modules relative to the chassis in radians
     public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = -(Math.PI / 2) - (Math.PI / 6) - 0.226;
-    public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = Math.PI + 0.226;
+    public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = 2*Math.PI*0.144 + (Math.PI / 2)- 0.226;
     public static final double BACK_LEFT_CHASSIS_ANGULAR_OFFSET = 0 - 0.226; // GOOD
     public static final double BACK_RIGHT_CHASSIS_ANGULAR_OFFSET = -(Math.PI / 2) + 0.226;
 
@@ -60,7 +60,7 @@ public abstract class Constants {
     public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(4);
     // This is the L1 gear reduction on the MK4 modules 
     public static final double DRIVING_MOTOR_REDUCTION = 8.14;
-    public static final double TURNING_MOTOR_REDUCTION = 12.8;
+    public static final double TURNING_MOTOR_REDUCTION = 0.078125; // 1/12.8
     // The driving motor is a Krakenx60 without FOC
     public static final double DRIVING_MOTOR_FREE_SPEED_RPM = 5800;
     public static final double DRIVING_VELOCITY_FEED_FORWARD = 1 / ModuleConstants.DRIVING_MOTOR_FREE_SPEED_RPM;
