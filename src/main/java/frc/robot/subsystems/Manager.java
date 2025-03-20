@@ -8,14 +8,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.AlgaeIntake.AlgaeStates;
 import frc.robot.subsystems.Elevator.ElevatorStates;
 import frc.robot.subsystems.Pivot.PivotStates;
-import frc.robot.subsystems.Spitter.SpitterStates;
 
 public class Manager extends SubsystemBase implements CheckableSubsystem, StateSubsystem {
 
   private boolean status = false;
   private boolean initialized = false;
 
-  private Spitter spitter = Spitter.getInstance();
   private Pivot pivot = Pivot.getInstance();
   private Elevator elevator = Elevator.getInstance();
   private AlgaeIntake algaeIntake = AlgaeIntake.getInstance();
@@ -25,7 +23,6 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
   /** Creates a new Manager. */
   public Manager() {
     // All subsystems should initialize when calling getInstance()
-    initialized &= spitter.getInitialized();
     initialized &= pivot.getInitialized();
     initialized &= elevator.getInitialized();
     initialized &= algaeIntake.getInitialized();
@@ -36,7 +33,6 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
    */
   @Override
   public void stop() {
-    spitter.stop();
     pivot.stop();
     elevator.stop();
     algaeIntake.stop();
@@ -55,7 +51,6 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
    */
   @Override
   public boolean checkSubsystem() {
-    status = spitter.checkSubsystem();
     status &= pivot.checkSubsystem();
     status &= elevator.checkSubsystem();
     status &= algaeIntake.checkSubsystem();
@@ -68,7 +63,6 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
    */
   @Override
   public void update() {
-    spitter.update();
     pivot.update();
     elevator.update();
     algaeIntake.update();
@@ -84,18 +78,6 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
         break;
       case ALGAE_SCORE:
         break;
-      case CORAL_INTAKE:
-        break;
-      case CORAL_L1:
-        if(elevator.atSetpoint()) {
-          spitter.setDesiredState(SpitterStates.SCORING);
-        }
-        break;
-      case CORAL_L2:
-        if(elevator.atSetpoint()) {
-          spitter.setDesiredState(SpitterStates.SCORING);
-        }
-        break;
 
       default:
         break;
@@ -110,46 +92,24 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
   public void handleStateTransition() {
     switch(desiredState) {
       case IDLE:
-        spitter.setDesiredState(SpitterStates.IDLE);
         pivot.setDesiredState(PivotStates.IDLE);
         elevator.setDesiredState(ElevatorStates.IDLE);
         algaeIntake.setDesiredState(AlgaeStates.IDLE);
         break;
       case DRIVE:
-        spitter.setDesiredState(SpitterStates.IDLE);
         pivot.setDesiredState(PivotStates.STORED);
         elevator.setDesiredState(ElevatorStates.STORED);
         algaeIntake.setDesiredState(AlgaeStates.IDLE);
         break;
       case ALGAE_INTAKE:
-        spitter.setDesiredState(SpitterStates.IDLE);
         pivot.setDesiredState(PivotStates.INTAKING);
         elevator.setDesiredState(ElevatorStates.STORED);
         algaeIntake.setDesiredState(AlgaeStates.INTAKING);
         break;
       case ALGAE_SCORE:
-        spitter.setDesiredState(SpitterStates.IDLE);
         pivot.setDesiredState(PivotStates.SCORING);
         elevator.setDesiredState(ElevatorStates.STORED);
         algaeIntake.setDesiredState(AlgaeStates.SCORING);
-        break;
-      case CORAL_INTAKE:
-        spitter.setDesiredState(SpitterStates.INTAKING);
-        pivot.setDesiredState(PivotStates.STORED);
-        elevator.setDesiredState(ElevatorStates.INTAKING);
-        algaeIntake.setDesiredState(AlgaeStates.IDLE);
-        break;
-      case CORAL_L1:
-        spitter.setDesiredState(SpitterStates.IDLE);
-        pivot.setDesiredState(PivotStates.STORED);
-        elevator.setDesiredState(ElevatorStates.L1);
-        algaeIntake.setDesiredState(AlgaeStates.IDLE);
-        break;
-      case CORAL_L2:
-        spitter.setDesiredState(SpitterStates.IDLE);
-        pivot.setDesiredState(PivotStates.STORED);
-        elevator.setDesiredState(ElevatorStates.L2);
-        algaeIntake.setDesiredState(AlgaeStates.IDLE);
         break;
 
       default:
@@ -202,11 +162,5 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
     ALGAE_INTAKE,
     /** Pushing the Algae out of our robot and into the processor */
     ALGAE_SCORE,
-    /** Intaking coral from the coral station through the funnel */
-    CORAL_INTAKE,
-    /** Scoring coral in the L1 trough */
-    CORAL_L1,
-    /** Scoring coral on the L2 branch */
-    CORAL_L2;
   }
 }

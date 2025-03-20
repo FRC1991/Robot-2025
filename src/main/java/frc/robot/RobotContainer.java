@@ -4,12 +4,8 @@
 
 package frc.robot;
 
-import org.opencv.features2d.AgastFeatureDetector;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.net.WebServer;
@@ -25,10 +21,8 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Manager;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Manager.ManagerStates;
-import frc.robot.subsystems.Pivot.PivotStates;
 import frc.robot.subsystems.Swerve.SwerveStates;
 import frc.robot.subsystems.Pivot;
-import frc.robot.subsystems.Spitter;
 import frc.utils.Utils.ElasticUtil;
 
 public class RobotContainer {
@@ -39,7 +33,6 @@ public class RobotContainer {
   private final Manager m_Manager = new Manager();
 
   public RobotContainer() {
-    NamedCommands.registerCommand("CORAL_L2", new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.CORAL_L2), m_Manager));
     NamedCommands.registerCommand("DRIVE", new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
     NamedCommands.registerCommand("ALGAE_SCORE", new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.ALGAE_SCORE), m_Manager));
     NamedCommands.registerCommand("IDLE", new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.IDLE), m_Manager));
@@ -53,7 +46,6 @@ public class RobotContainer {
     
     ElasticUtil.putString("Manager State", () -> m_Manager.getState().toString());
     ElasticUtil.putString("Swerve State", () -> Swerve.getInstance().getState().toString());
-    ElasticUtil.putString("Spitter State", () -> Spitter.getInstance().getState().toString());
     ElasticUtil.putString("Pivote State", () -> Pivot.getInstance().getState().toString());
     ElasticUtil.putString("Elevator State", () -> Elevator.getInstance().getState().toString());
     ElasticUtil.putString("AlgaeIntake State", () -> AlgaeIntake.getInstance().getState().toString());
@@ -71,8 +63,11 @@ public class RobotContainer {
             () -> Swerve.getInstance().drive(0.8, 0, 0, false), Swerve.getInstance()
         ).withTimeout(3),
         new InstantCommand(
-            () -> m_Manager.setDesiredState(ManagerStates.CORAL_L2), m_Manager
-        ).withTimeout(5)
+            () -> m_Manager.setDesiredState(ManagerStates.ALGAE_SCORE), m_Manager
+        ).withTimeout(5),
+        new InstantCommand(
+            () -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager
+        )
     );
     autoChooser.addOption("coral uno por favor", coralOne);
 
@@ -99,14 +94,6 @@ public class RobotContainer {
     // OI.auxController.y()
     //     .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.CORAL_L1), m_Manager))
     //     .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
-    
-    OI.auxController.b()
-        .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.CORAL_L2), m_Manager))
-        .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
-
-    OI.auxController.x()
-        .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.CORAL_INTAKE), m_Manager))
-        .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
     
     OI.auxController.rightBumper()
         .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.ALGAE_SCORE), m_Manager))
