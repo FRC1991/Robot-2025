@@ -20,9 +20,11 @@ import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Manager;
 import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.AlgaeIntake.AlgaeStates;
 import frc.robot.subsystems.Manager.ManagerStates;
 import frc.robot.subsystems.Swerve.SwerveStates;
 import frc.robot.subsystems.Pivot;
+import frc.robot.subsystems.Roller;
 import frc.utils.Utils.ElasticUtil;
 
 public class RobotContainer {
@@ -49,6 +51,7 @@ public class RobotContainer {
     ElasticUtil.putString("Pivote State", () -> Pivot.getInstance().getState().toString());
     ElasticUtil.putString("Elevator State", () -> Elevator.getInstance().getState().toString());
     ElasticUtil.putString("AlgaeIntake State", () -> AlgaeIntake.getInstance().getState().toString());
+    ElasticUtil.putString("Roller State", () -> Roller.getInstance().getState().toString());
 
     // This would throw an error no matter what
     // in last year's code, so let's hope for better
@@ -63,7 +66,7 @@ public class RobotContainer {
             () -> Swerve.getInstance().drive(0.8, 0, 0, false), Swerve.getInstance()
         ).withTimeout(3),
         new InstantCommand(
-            () -> m_Manager.setDesiredState(ManagerStates.ALGAE_SCORE), m_Manager
+            () -> AlgaeIntake.getInstance().setDesiredState(AlgaeStates.SCORING), AlgaeIntake.getInstance()
         ).withTimeout(5),
         new InstantCommand(
             () -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager
@@ -72,28 +75,21 @@ public class RobotContainer {
     autoChooser.addOption("coral uno por favor", coralOne);
 
     SmartDashboard.putData("pathplanner chooser", autoChooser);
-    
-    // autoTwo = new SendableChooser<Command>();
-    // autoTwo.addOption("leave B auto", new PathPlannerAuto("Leave(B)-a"));
-    // autoTwo.addOption("leave B path", PathPlannerPath.fromPathFile("Leave(B)"));
-    // SmartDashboard.putData("manual chooser", autoTwo);
   }
 
   private void configureBindings() {
     m_Manager.setDefaultCommand(new RunCommand(() -> m_Manager.update(), m_Manager));
+    // For driving
     Swerve.getInstance().setDefaultCommand(new RunCommand(() -> Swerve.getInstance().update(), Swerve.getInstance()));
-
+    // Manual control of pivot for zeroing th encoders during the match
     Pivot.getInstance().setDefaultCommand(new RunCommand(() -> Pivot.getInstance().motor.set(MathUtil.applyDeadband(-OI.auxController.getRightY(), 0.07)), Pivot.getInstance()));
 
     OI.auxController.y()
         .onTrue(new InstantCommand(() -> Pivot.getInstance().motor.getEncoder().setPosition(0)));
 
-    // Swerve.getInstance().setDesiredState(SwerveStates.DRIVE);
-    // m_Manager.setDesiredState(ManagerStates.DRIVE);
-
-    // OI.auxController.y()
-    //     .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.CORAL_L1), m_Manager))
-    //     .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
+    OI.auxController.a()
+        .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.TAKEOFF), m_Manager))
+        .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
     
     OI.auxController.rightBumper()
         .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.ALGAE_SCORE), m_Manager))

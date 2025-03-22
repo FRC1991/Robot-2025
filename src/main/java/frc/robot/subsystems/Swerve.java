@@ -25,7 +25,6 @@ import frc.robot.Constants.CANConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.SwerveConstants;
 import frc.utils.LimelightHelpers;
-import frc.utils.Utils;
 import frc.utils.Utils.ElasticUtil;
 import frc.robot.Constants;
 import frc.robot.OI;

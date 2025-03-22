@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.AlgaeIntake.AlgaeStates;
 import frc.robot.subsystems.Elevator.ElevatorStates;
 import frc.robot.subsystems.Pivot.PivotStates;
+import frc.robot.subsystems.Roller.RollerStates;
 
 public class Manager extends SubsystemBase implements CheckableSubsystem, StateSubsystem {
 
@@ -17,6 +18,7 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
   private Pivot pivot = Pivot.getInstance();
   private Elevator elevator = Elevator.getInstance();
   private AlgaeIntake algaeIntake = AlgaeIntake.getInstance();
+  private Roller roller = Roller.getInstance();
 
   private ManagerStates desiredState, currentState = ManagerStates.IDLE;
 
@@ -26,6 +28,7 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
     initialized &= pivot.getInitialized();
     initialized &= elevator.getInitialized();
     initialized &= algaeIntake.getInitialized();
+    initialized &= roller.getInitialized();
   }
 
   /**
@@ -36,6 +39,7 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
     pivot.stop();
     elevator.stop();
     algaeIntake.stop();
+    roller.stop();
   }
 
   /**
@@ -54,6 +58,7 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
     status &= pivot.checkSubsystem();
     status &= elevator.checkSubsystem();
     status &= algaeIntake.checkSubsystem();
+    status &= roller.checkSubsystem();
 
     return status;
   }
@@ -66,6 +71,7 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
     pivot.update();
     elevator.update();
     algaeIntake.update();
+    roller.update();
 
     switch(currentState) {
       case IDLE:
@@ -77,6 +83,8 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
       case ALGAE_INTAKE:
         break;
       case ALGAE_SCORE:
+        break;
+      case TAKEOFF:
         break;
 
       default:
@@ -95,21 +103,31 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
         pivot.setDesiredState(PivotStates.IDLE);
         elevator.setDesiredState(ElevatorStates.IDLE);
         algaeIntake.setDesiredState(AlgaeStates.IDLE);
+        roller.setDesiredState(RollerStates.IDLE);
         break;
       case DRIVE:
         pivot.setDesiredState(PivotStates.STORED);
         elevator.setDesiredState(ElevatorStates.STORED);
         algaeIntake.setDesiredState(AlgaeStates.IDLE);
+        roller.setDesiredState(RollerStates.IDLE);
         break;
       case ALGAE_INTAKE:
         pivot.setDesiredState(PivotStates.INTAKING);
         elevator.setDesiredState(ElevatorStates.STORED);
         algaeIntake.setDesiredState(AlgaeStates.INTAKING);
+        roller.setDesiredState(RollerStates.IDLE);
         break;
       case ALGAE_SCORE:
         pivot.setDesiredState(PivotStates.SCORING);
         elevator.setDesiredState(ElevatorStates.STORED);
         algaeIntake.setDesiredState(AlgaeStates.SCORING);
+        roller.setDesiredState(RollerStates.IDLE);
+        break;
+      case TAKEOFF:
+        pivot.setDesiredState(PivotStates.STORED);
+        elevator.setDesiredState(ElevatorStates.L2);
+        algaeIntake.setDesiredState(AlgaeStates.IDLE);
+        roller.setDesiredState(RollerStates.INTAKING);
         break;
 
       default:
@@ -162,5 +180,6 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
     ALGAE_INTAKE,
     /** Pushing the Algae out of our robot and into the processor */
     ALGAE_SCORE,
+    TAKEOFF
   }
 }
