@@ -48,7 +48,7 @@ public class RobotContainer {
     
     ElasticUtil.putString("Manager State", () -> m_Manager.getState().toString());
     ElasticUtil.putString("Swerve State", () -> Swerve.getInstance().getState().toString());
-    ElasticUtil.putString("Pivote State", () -> Pivot.getInstance().getState().toString());
+    ElasticUtil.putString("Pivot State", () -> Pivot.getInstance().getState().toString());
     ElasticUtil.putString("Elevator State", () -> Elevator.getInstance().getState().toString());
     ElasticUtil.putString("AlgaeIntake State", () -> AlgaeIntake.getInstance().getState().toString());
     ElasticUtil.putString("Roller State", () -> Roller.getInstance().getState().toString());
@@ -89,6 +89,10 @@ public class RobotContainer {
 
     OI.auxController.a()
         .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.TAKEOFF), m_Manager))
+        .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
+    
+    OI.auxController.b()
+        .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.SPIT), m_Manager))
         .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
     
     OI.auxController.rightBumper()

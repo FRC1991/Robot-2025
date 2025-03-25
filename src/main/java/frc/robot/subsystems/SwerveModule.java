@@ -70,9 +70,9 @@ public class SwerveModule implements CheckableSubsystem {
     driveTalonConfig.TorqueCurrent.PeakForwardTorqueCurrent = 80.0;
     driveTalonConfig.TorqueCurrent.PeakReverseTorqueCurrent = -80.0;
     driveTalonConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    driveTalonConfig.CurrentLimits.SupplyCurrentLimit = 55;
+    driveTalonConfig.CurrentLimits.SupplyCurrentLimit = 70;
     driveTalonConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    driveTalonConfig.CurrentLimits.StatorCurrentLimit = 70;
+    driveTalonConfig.CurrentLimits.StatorCurrentLimit = 80;
     driveTalonConfig.ClosedLoopRamps.TorqueClosedLoopRampPeriod = 0.02;
     driveTalonConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     driveTalonConfig.Feedback.SensorToMechanismRatio = drivingFactor;

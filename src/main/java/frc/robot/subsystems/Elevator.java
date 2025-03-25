@@ -85,7 +85,7 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
   }
 
   public double getEncoder() {
-    return (motor1.getEncoder().getPosition() - motor2.getEncoder().getPosition()) / 2;
+    return (motor2.getEncoder().getPosition() - motor1.getEncoder().getPosition()) / 2;
   }
 
   public boolean atSetpoint() {
@@ -147,16 +147,17 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
       case BROKEN:
         break;
       case INTAKING:
-        set(Utils.normalize(posController.calculate(getEncoder())));
+        set(Utils.normalize(-posController.calculate(getEncoder())));
         break;
       case STORED:
-        set(Utils.normalize(posController.calculate(getEncoder())));
+        set(Utils.normalize(-posController.calculate(getEncoder())));
         break;
       case L1:
-        set(Utils.normalize(posController.calculate(getEncoder())));
+        set(Utils.normalize(-posController.calculate(getEncoder())));
         break;
       case L2:
-        set(Utils.normalize(posController.calculate(getEncoder())));
+        set(Utils.normalize(-posController.calculate(getEncoder())));
+        System.out.println(Utils.normalize(-posController.calculate(getEncoder())));
         break;
         
 

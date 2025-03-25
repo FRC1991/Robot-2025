@@ -86,6 +86,8 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
         break;
       case TAKEOFF:
         break;
+      case SPIT:
+        break;
 
       default:
         break;
@@ -129,6 +131,13 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
         algaeIntake.setDesiredState(AlgaeStates.IDLE);
         roller.setDesiredState(RollerStates.INTAKING);
         break;
+      case SPIT:
+        pivot.setDesiredState(PivotStates.STORED);
+        elevator.setDesiredState(ElevatorStates.STORED);
+        algaeIntake.setDesiredState(AlgaeStates.IDLE);
+        roller.setDesiredState(RollerStates.SCORING);
+        break;
+      
 
       default:
         break;
@@ -180,6 +189,7 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
     ALGAE_INTAKE,
     /** Pushing the Algae out of our robot and into the processor */
     ALGAE_SCORE,
-    TAKEOFF
+    TAKEOFF,
+    SPIT,
   }
 }

@@ -33,7 +33,7 @@ public class Roller extends SubsystemBase implements CheckableSubsystem, StateSu
 
     SparkMaxConfig rollersConfig = new SparkMaxConfig();
 
-    rollersConfig.idleMode(IdleMode.kCoast)
+    rollersConfig.idleMode(IdleMode.kBrake)
         .smartCurrentLimit(Constants.NEO_CURRENT_LIMIT);
 
     motor.configure(rollersConfig, ResetMode.kResetSafeParameters,
