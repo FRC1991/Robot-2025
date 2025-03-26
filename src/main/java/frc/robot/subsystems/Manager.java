@@ -88,6 +88,8 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
         break;
       case SPIT:
         break;
+      case HOLD:
+        break;
 
       default:
         break;
@@ -128,6 +130,12 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
       case TAKEOFF:
         pivot.setDesiredState(PivotStates.STORED);
         elevator.setDesiredState(ElevatorStates.L2);
+        algaeIntake.setDesiredState(AlgaeStates.IDLE);
+        roller.setDesiredState(RollerStates.INTAKING);
+        break;
+      case HOLD:
+        pivot.setDesiredState(PivotStates.STORED);
+        elevator.setDesiredState(ElevatorStates.STORED);
         algaeIntake.setDesiredState(AlgaeStates.IDLE);
         roller.setDesiredState(RollerStates.INTAKING);
         break;
@@ -191,5 +199,6 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
     ALGAE_SCORE,
     TAKEOFF,
     SPIT,
+    HOLD,
   }
 }

@@ -89,7 +89,7 @@ public class RobotContainer {
 
     OI.auxController.a()
         .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.TAKEOFF), m_Manager))
-        .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
+        .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.HOLD), m_Manager));
     
     OI.auxController.b()
         .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.SPIT), m_Manager))
