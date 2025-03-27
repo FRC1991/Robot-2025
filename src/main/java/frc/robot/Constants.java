@@ -91,10 +91,11 @@ public abstract class Constants {
     public static final int GYRO_ID = 10;
 
     public static final int PIVOT_ID = 13;
-    public static final int ALGAE_INTAKE_ID = 16;
+    public static final int ALGAE_INTAKE_ID = 15;
     public static final int ROLLER_ID = 14;
     public static final int ELEVATOR_MOTOR_ONE_ID = 11;
     public static final int ELEVATOR_MOTOR_TWO_ID = 12;
+    public static final int CLIMER_ID = 17;
   }
 
   public static abstract class OIConstants {
@@ -128,5 +129,10 @@ public abstract class Constants {
     public static final double STORED_POSITION = 0;
     public static final double INTAKING_POSITION = 0;
     public static final double PID_ERROR_TOLERANCE = 0.02;
+  }
+
+  public static abstract class ClimberConstants {
+    public static final double OUT_POSITION = 1;
+    public static final double IN_POSITION = 1;
   }
 }

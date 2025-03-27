@@ -38,16 +38,16 @@ public class Robot extends TimedRobot {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     Roller.getInstance().setDesiredState(RollerStates.INTAKING);
+    
+    if (m_autonomousCommand != null) {
+      m_autonomousCommand.schedule();
+    }
     try {
-      Thread.sleep(1000);
+      Thread.sleep(100);
     } catch (InterruptedException e) {
       Roller.getInstance().setDesiredState(RollerStates.IDLE);
     }
     Roller.getInstance().setDesiredState(RollerStates.IDLE);
-
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
-    }
   }
 
   @Override

@@ -103,6 +103,10 @@ public class RobotContainer {
         .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.ALGAE_INTAKE), m_Manager))
         .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
     
+    OI.auxController.back()
+        .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.OUT_CLIMB), m_Manager))
+        .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.IN_CLIMB), m_Manager));
+    
     // Stops movement by setting the wheels in an X formation
     OI.driverController.rightBumper()
         .onTrue(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.LOCKED), Swerve.getInstance()))

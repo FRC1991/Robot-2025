@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.AlgaeIntake.AlgaeStates;
+import frc.robot.subsystems.Climber.ClimberStates;
 import frc.robot.subsystems.Elevator.ElevatorStates;
 import frc.robot.subsystems.Pivot.PivotStates;
 import frc.robot.subsystems.Roller.RollerStates;
@@ -19,6 +20,7 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
   private Elevator elevator = Elevator.getInstance();
   private AlgaeIntake algaeIntake = AlgaeIntake.getInstance();
   private Roller roller = Roller.getInstance();
+  private Climber climber = Climber.getInstance();
 
   private ManagerStates desiredState, currentState = ManagerStates.IDLE;
 
@@ -29,6 +31,7 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
     initialized &= elevator.getInitialized();
     initialized &= algaeIntake.getInitialized();
     initialized &= roller.getInitialized();
+    initialized &= climber.getInitialized();
   }
 
   /**
@@ -40,6 +43,7 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
     elevator.stop();
     algaeIntake.stop();
     roller.stop();
+    climber.stop();
   }
 
   /**
@@ -59,6 +63,7 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
     status &= elevator.checkSubsystem();
     status &= algaeIntake.checkSubsystem();
     status &= roller.checkSubsystem();
+    status &= climber.checkSubsystem();
 
     return status;
   }
@@ -72,7 +77,8 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
     elevator.update();
     algaeIntake.update();
     roller.update();
-
+    climber.update();
+    
     switch(currentState) {
       case IDLE:
         // The robot should never be IDLE in a match
@@ -145,6 +151,20 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
         algaeIntake.setDesiredState(AlgaeStates.IDLE);
         roller.setDesiredState(RollerStates.SCORING);
         break;
+      case OUT_CLIMB:
+        pivot.setDesiredState(PivotStates.STORED);
+        elevator.setDesiredState(ElevatorStates.STORED);
+        algaeIntake.setDesiredState(AlgaeStates.IDLE);
+        roller.setDesiredState(RollerStates.IDLE);
+        climber.setDesiredState(ClimberStates.OUT);
+        break;
+      case IN_CLIMB:
+        pivot.setDesiredState(PivotStates.STORED);
+        elevator.setDesiredState(ElevatorStates.STORED);
+        algaeIntake.setDesiredState(AlgaeStates.IDLE);
+        roller.setDesiredState(RollerStates.IDLE);
+        climber.setDesiredState(ClimberStates.IN);
+        break;
       
 
       default:
@@ -200,5 +220,7 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
     TAKEOFF,
     SPIT,
     HOLD,
+    OUT_CLIMB,
+    IN_CLIMB,
   }
 }
