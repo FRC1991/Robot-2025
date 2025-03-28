@@ -31,7 +31,7 @@ public class Pivot extends SubsystemBase implements CheckableSubsystem, StateSub
 
   private static Pivot m_Instance;
 
-  private double p = 0.1, i = 0, d = 0;
+  private double p = 0.03, i = 0, d = 0;
 
   private PivotStates desiredState, currentState = PivotStates.IDLE;
 
@@ -50,6 +50,7 @@ public class Pivot extends SubsystemBase implements CheckableSubsystem, StateSub
     ElasticUtil.putDouble("pivot P", () -> this.p, value -> {this.p=value;});
     ElasticUtil.putDouble("pivot I", () -> this.i, value -> {this.i=value;});
     ElasticUtil.putDouble("pivot D", () -> this.d, value -> {this.d=value;});
+    ElasticUtil.putDouble("pivot encoder", () -> motor.getEncoder().getPosition());
 
     posController = new PIDController(p, i, d);
     posController.setTolerance(PivotConstants.PID_ERROR_TOLERANCE);

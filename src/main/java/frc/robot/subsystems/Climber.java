@@ -15,7 +15,6 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.CANConstants;
-import frc.robot.Constants.ClimberConstants;
 import frc.utils.Utils;
 import frc.utils.Utils.ElasticUtil;
 
@@ -31,7 +30,7 @@ public class Climber extends SubsystemBase implements CheckableSubsystem, StateS
 
   private static Climber m_Instance;
 
-  private double p = 0.5, i = 0, d = 0, pos = -300;
+  private double p = 0.3, i = 0, d = 0, pos = -300;
 
   private ClimberStates desiredState, currentState = ClimberStates.IDLE;
 
