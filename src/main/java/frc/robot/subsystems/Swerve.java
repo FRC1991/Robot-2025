@@ -83,9 +83,10 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
   private PIDController angleController = new PIDController(0, 0, 0);
   private boolean activelyTurning;
   
-  private PIDController alignmentController = new PIDController(0.02, 0, 0);
+  private PIDController alignmentController = new PIDController(0.01, 0, 0);
 
   private double p = 0.02, i = 0, d = 0;
+  private double driver = 0.8, lime = 0.2;
 
   // Constructor is private to prevent multiple instances from being made
   private Swerve() {
@@ -96,8 +97,11 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
     ElasticUtil.putDouble("P", () -> this.p, value -> {this.p=value;});
     ElasticUtil.putDouble("I", () -> this.i, value -> {this.i=value;});
     ElasticUtil.putDouble("D", () -> this.d, value -> {this.d=value;});
+    ElasticUtil.putDouble("driver", () -> this.driver, value -> {this.driver=value;});
+    ElasticUtil.putDouble("lime", () -> this.lime, value -> {this.lime=value;});
     ElasticUtil.putDouble("turning power", () -> angleController.calculate(getHeading(), desiredHeading));
     
+
     angleController.setTolerance(2);
     angleController.enableContinuousInput(0, 360);
     angleController.setPID(p, i, d);
@@ -476,8 +480,9 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
         break;
       case ALIGNING:
         drive(
-            LimelightHelpers.getTA(Constants.LIMELIGHT_NAME) >= 0.3 ?
-              alignmentController.calculate(LimelightHelpers.getTX(Constants.LIMELIGHT_NAME), 0)
+            LimelightHelpers.getTA(Constants.LIMELIGHT_NAME) >= 1.7 ?
+              -driver*MathUtil.applyDeadband(alignmentController.calculate(LimelightHelpers.getTX(Constants.LIMELIGHT_NAME), 0), OIConstants.DRIVER_DEADBAND)
+              + lime*(MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftY()), OIConstants.DRIVER_DEADBAND))
             :
               MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftY()), OIConstants.DRIVER_DEADBAND)
             ,

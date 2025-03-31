@@ -93,15 +93,15 @@ public class RobotContainer {
     // Pivot.getInstance().setDefaultCommand(new RunCommand(() -> Pivot.getInstance().motor.set(MathUtil.applyDeadband(-OI.auxController.getRightY(), 0.07)), Climber.getInstance()));
     Climber.getInstance().setDefaultCommand(new RunCommand(() -> Climber.getInstance().motor.set(MathUtil.applyDeadband(-OI.auxController.getLeftY(), 0.07)), Climber.getInstance()));
 
-    OI.auxController.y()
-        .onTrue(new InstantCommand(() -> Pivot.getInstance().motor.getEncoder().setPosition(0)));
+    // OI.auxController.y()
+    //     .onTrue(new InstantCommand(() -> Pivot.getInstance().motor.getEncoder().setPosition(0)));
 
     OI.auxController.povUp()
-        .whileTrue(new RunCommand(() -> Pivot.getInstance().motor.set(-0.3), Pivot.getInstance()))
+        .whileTrue(new RunCommand(() -> Pivot.getInstance().motor.set(0.3), Pivot.getInstance()))
         .onFalse(new InstantCommand(() -> Pivot.getInstance().motor.getEncoder().setPosition(0)));
 
     OI.auxController.povDown()
-        .whileTrue(new RunCommand(() -> Pivot.getInstance().motor.set(0.3), Pivot.getInstance()))
+        .whileTrue(new RunCommand(() -> Pivot.getInstance().motor.set(-0.3), Pivot.getInstance()))
         .onFalse(new InstantCommand(() -> Pivot.getInstance().motor.getEncoder().setPosition(0)));
 
     OI.auxController.a()
@@ -139,7 +139,7 @@ public class RobotContainer {
         .onFalse(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.DRIVE), Swerve.getInstance()));
 
     OI.driverController.leftBumper()
-        .onTrue(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.MANUAL), Swerve.getInstance()))
+        .onTrue(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.ALIGNING), Swerve.getInstance()))
         .onFalse(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.DRIVE), Swerve.getInstance()));
     
     // Zeroes out the gyro

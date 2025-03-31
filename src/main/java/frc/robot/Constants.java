@@ -108,7 +108,7 @@ public abstract class Constants {
     // These are arbitrary values
     public static final double STORED_POSITION = 0;
     public static final double SCORING_POSITION = -2;
-    public static final double INTAKE_POSITION = -7;
+    public static final double INTAKE_POSITION = -8;
     public static final double PID_ERROR_TOLERANCE = 0;
   }
 
