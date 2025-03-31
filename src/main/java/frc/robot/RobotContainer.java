@@ -9,6 +9,8 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.net.WebServer;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -16,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Elevator;
@@ -33,7 +36,7 @@ public class RobotContainer {
   private SendableChooser<Command> autoChooser;
 //   private SendableChooser<Command> autoTwo;
 
-  private final Manager m_Manager = new Manager();
+  public final Manager m_Manager = new Manager();
 
   public RobotContainer() {
     NamedCommands.registerCommand("DRIVE", new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
@@ -59,16 +62,20 @@ public class RobotContainer {
     // this year.
     autoChooser = AutoBuilder.buildAutoChooser();
 
-    RunCommand leave = new RunCommand(() -> Swerve.getInstance().drive(0.5, 0, 0, false), Swerve.getInstance());
+    RunCommand leave = new RunCommand(() -> Swerve.getInstance().drive(-0.5, 0, 0, false), Swerve.getInstance());
     autoChooser.addOption("leave thing", leave);
 
     SequentialCommandGroup coralOne = new SequentialCommandGroup(
         new RunCommand(
-            () -> Swerve.getInstance().drive(0.8, 0, 0, false), Swerve.getInstance()
-        ).withTimeout(3),
+            () -> Swerve.getInstance().drive(-0.25, 0, 0, false), Swerve.getInstance()
+        ).withTimeout(2),
         new InstantCommand(
-            () -> AlgaeIntake.getInstance().setDesiredState(AlgaeStates.SCORING), AlgaeIntake.getInstance()
-        ).withTimeout(5),
+            () -> AlgaeIntake.getInstance().setDesiredState(AlgaeStates.INTAKING), AlgaeIntake.getInstance()
+        ).withTimeout(1),
+        new WaitCommand(Time.ofRelativeUnits(2, Units.Seconds)),
+        new RunCommand(
+            () -> Swerve.getInstance().drive(0.3, 0, 0, false), Swerve.getInstance()
+        ).withTimeout(0.5),
         new InstantCommand(
             () -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager
         )

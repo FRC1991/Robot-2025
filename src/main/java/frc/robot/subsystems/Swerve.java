@@ -83,7 +83,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
   private PIDController angleController = new PIDController(0, 0, 0);
   private boolean activelyTurning;
   
-  private PIDController alignmentController = new PIDController(0.01, 0, 0);
+  private PIDController alignmentController = new PIDController(0.02, 0, 0);
 
   private double p = 0.02, i = 0, d = 0;
 
@@ -135,7 +135,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
 
     }
 
-    setHeading(0);
+    setHeading(180);
   }
 
   /**
@@ -476,7 +476,11 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
         break;
       case ALIGNING:
         drive(
-            -alignmentController.calculate(LimelightHelpers.getTX(Constants.LIMELIGHT_NAME), 0),
+            LimelightHelpers.getTA(Constants.LIMELIGHT_NAME) >= 0.3 ?
+              alignmentController.calculate(LimelightHelpers.getTX(Constants.LIMELIGHT_NAME), 0)
+            :
+              MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftY()), OIConstants.DRIVER_DEADBAND)
+            ,
             MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftX()), OIConstants.DRIVER_DEADBAND),
             -angleController.calculate(getHeading(), 270),
             true, 0.8);

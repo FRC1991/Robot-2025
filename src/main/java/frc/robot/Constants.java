@@ -107,8 +107,8 @@ public abstract class Constants {
   public static abstract class PivotConstants {
     // These are arbitrary values
     public static final double STORED_POSITION = 0;
-    public static final double SCORING_POSITION = 2;
-    public static final double INTAKE_POSITION = 7;
+    public static final double SCORING_POSITION = -2;
+    public static final double INTAKE_POSITION = -7;
     public static final double PID_ERROR_TOLERANCE = 0;
   }
 
@@ -125,7 +125,7 @@ public abstract class Constants {
   public static abstract class ElevatorConstants {
     public static final double ELEVATOR_MOTOR_REDUCTION = (0.0185185185);
     public static final double L1_POSITION_INCHES = 1.7;
-    public static final double L2_POSITION_INCHES = 3.2;
+    public static final double L2_POSITION_INCHES = -3.0;
     public static final double STORED_POSITION = 0;
     public static final double INTAKING_POSITION = 0;
     public static final double PID_ERROR_TOLERANCE = 0.02;

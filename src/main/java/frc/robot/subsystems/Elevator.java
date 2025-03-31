@@ -157,7 +157,6 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
         break;
       case L2:
         set(Utils.normalize(-posController.calculate(getEncoder())));
-        System.out.println(Utils.normalize(-posController.calculate(getEncoder())));
         break;
         
 
