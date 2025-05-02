@@ -42,7 +42,7 @@ public abstract class Constants {
 
     // Angular offsets of the modules relative to the chassis in radians
     public static final double FRONT_LEFT_CHASSIS_ANGULAR_OFFSET = -(Math.PI / 2) - (Math.PI / 6) - 0.226;
-    public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = 2*Math.PI*0.144 + (Math.PI / 2)- 0.226;
+    public static final double FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET = (Math.PI / 3) + (Math.PI / 2) - 0.226;
     public static final double BACK_LEFT_CHASSIS_ANGULAR_OFFSET = 0 - 0.226; // GOOD
     public static final double BACK_RIGHT_CHASSIS_ANGULAR_OFFSET = -(Math.PI / 2) + 0.226;
 
@@ -95,7 +95,8 @@ public abstract class Constants {
     public static final int ROLLER_ID = 14;
     public static final int ELEVATOR_MOTOR_ONE_ID = 11;
     public static final int ELEVATOR_MOTOR_TWO_ID = 12;
-    public static final int CLIMER_ID = 17;
+    public static final int CLIMER_ONE_ID = 17;
+    public static final int CLIMER_TWO_ID = 16;
   }
 
   public static abstract class OIConstants {

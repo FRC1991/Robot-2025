@@ -24,7 +24,7 @@ public class Climber extends SubsystemBase implements CheckableSubsystem, StateS
   private boolean status = false;
   private boolean initialized = false;
 
-  public SparkMax motor;
+  public SparkMax motor1, motor2;
 
   private PIDController posController;
 
@@ -36,25 +36,30 @@ public class Climber extends SubsystemBase implements CheckableSubsystem, StateS
 
   /** Creates a new Climbers. */
   private Climber() {
-    motor = new SparkMax(CANConstants.CLIMER_ID, MotorType.kBrushless);
+    motor1 = new SparkMax(CANConstants.CLIMER_ONE_ID, MotorType.kBrushless);
+    motor2 = new SparkMax(CANConstants.CLIMER_TWO_ID, MotorType.kBrushless);
 
     SparkMaxConfig climberConfig = new SparkMaxConfig();
 
     climberConfig.idleMode(IdleMode.kBrake)
         .smartCurrentLimit(Constants.NEO_CURRENT_LIMIT);
 
-    motor.configure(climberConfig, ResetMode.kResetSafeParameters,
+    motor1.configure(climberConfig, ResetMode.kResetSafeParameters,
+        PersistMode.kPersistParameters);
+    motor2.configure(climberConfig, ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
 
     ElasticUtil.putDouble("climber P", () -> this.p, value -> {this.p=value;});
     ElasticUtil.putDouble("climber I", () -> this.i, value -> {this.i=value;});
     ElasticUtil.putDouble("climber D", () -> this.d, value -> {this.d=value;});
     ElasticUtil.putDouble("climber pos", () -> this.pos, value -> {this.pos=value;});
-    ElasticUtil.putDouble("climber encoder", () -> motor.getEncoder().getPosition());
+    ElasticUtil.putDouble("climber encoder1", () -> motor1.getEncoder().getPosition());
+    ElasticUtil.putDouble("climber encoder2", () -> motor2.getEncoder().getPosition());
 
     posController = new PIDController(p, i, d);
 
-    motor.getEncoder().setPosition(0);
+    motor1.getEncoder().setPosition(0);
+    motor2.getEncoder().setPosition(0);
 
     initialized = true;
     status = true;
@@ -70,9 +75,15 @@ public class Climber extends SubsystemBase implements CheckableSubsystem, StateS
     return m_Instance;
   }
 
+  public void run(double speed) {
+    motor1.set(Utils.normalize(speed));
+    motor2.set(Utils.normalize(speed));
+  }
+
   @Override
   public void stop() {
-    motor.stopMotor();
+    motor1.stopMotor();
+    motor2.stopMotor();
   }
 
   @Override
@@ -127,7 +138,8 @@ public class Climber extends SubsystemBase implements CheckableSubsystem, StateS
         break;
       case IN:
       case OUT:
-        motor.set(Utils.normalize(posController.calculate(motor.getEncoder().getPosition())));
+        motor1.set(Utils.normalize(posController.calculate(motor1.getEncoder().getPosition())));
+        motor2.set(Utils.normalize(posController.calculate(motor2.getEncoder().getPosition())));
         break;
 
       default:

@@ -80,7 +80,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
   private SwerveStates desiredState, currentState = SwerveStates.IDLE;
 
   private double desiredHeading;
-  private PIDController angleController = new PIDController(0, 0, 0);
+  public PIDController angleController = new PIDController(0, 0, 0);
   private boolean activelyTurning;
   
   private PIDController alignmentController = new PIDController(0.01, 0, 0);
