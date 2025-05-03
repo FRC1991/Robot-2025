@@ -37,9 +37,15 @@ public class RobotContainer {
     configureElastic();
   }
 
+  /**
+   * Configures the auto chooser and other info. Most information is published
+   * and read from inside different subsystems.
+   */
   private void configureElastic() {
+    // This is from the Elastic documentation. I think it is for saving/reading layouts
     WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
     
+    // Current state of each subsystem and Manager
     ElasticUtil.putString("Manager State", () -> m_Manager.getState().toString());
     ElasticUtil.putString("Swerve State", () -> Swerve.getInstance().getState().toString());
     ElasticUtil.putString("Pivot State", () -> Pivot.getInstance().getState().toString());
@@ -54,16 +60,21 @@ public class RobotContainer {
     autoChooser.addOption("leave thing", leave);
 
     SequentialCommandGroup coralOne = new SequentialCommandGroup(
+      // Driving up to the reef with the ground intake facing the reef
       new RunCommand(
         () -> Swerve.getInstance().drive(-0.25, 0, 0, false), Swerve.getInstance()
       ).withTimeout(2),
+      // Spitting the coral off of the robot and into the trough
       new InstantCommand(
         () -> AlgaeIntake.getInstance().setDesiredState(AlgaeStates.INTAKING), AlgaeIntake.getInstance()
       ).withTimeout(1),
+      // Waiting for the coral to settle
       new WaitCommand(Time.ofRelativeUnits(2, Units.Seconds)),
+      // Driving away from the reef, so the robot doesn't support the coral at the end of auto
       new RunCommand(
         () -> Swerve.getInstance().drive(0.3, 0, 0, false), Swerve.getInstance()
-      ).withTimeout(0.5),
+      ).withTimeout(0.25),
+      // Setting the state to DRIVE for the start of teleop
       new InstantCommand(
         () -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager
       )
@@ -74,6 +85,9 @@ public class RobotContainer {
     SmartDashboard.putData("Auto", autoChooser);
   }
 
+  /**
+   * Sets all of the controls for both the driver and the aux driver
+   */
   private void configureBindings() {
     OI.auxController.povUp()
       .whileTrue(new RunCommand(() -> Pivot.getInstance().motor.set(0.3), Pivot.getInstance()))
@@ -105,6 +119,9 @@ public class RobotContainer {
       .onTrue(new InstantCommand(() -> Swerve.getInstance().setHeading(0), Swerve.getInstance()));
   }
 
+  /**
+   * @return The currently selected command from the auto chooser
+   */
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();
   }
