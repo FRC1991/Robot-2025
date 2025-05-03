@@ -16,7 +16,6 @@ import frc.robot.Constants.CANConstants;
 import frc.robot.Constants;
 import frc.robot.Constants.AlgaeConstants;
 
-// This is for the coral
 public class AlgaeIntake extends SubsystemBase implements CheckableSubsystem, StateSubsystem {
 
   private boolean status = false;

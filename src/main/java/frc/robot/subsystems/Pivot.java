@@ -19,7 +19,6 @@ import frc.robot.Constants.PivotConstants;
 import frc.utils.Utils;
 import frc.utils.Utils.ElasticUtil;
 
-// This is for the coral
 public class Pivot extends SubsystemBase implements CheckableSubsystem, StateSubsystem {
 
   private boolean status = false;
