@@ -71,9 +71,9 @@ public class AlgaeIntake extends SubsystemBase implements CheckableSubsystem, St
     return status;
   }
 
-  public void setDesiredState(AlgaeStates state) {
+  public void setDesiredState(State state) {
     if(this.desiredState != state) {
-      desiredState = state;
+      desiredState = (AlgaeStates) state;
       handleStateTransition();
     }
   }
@@ -133,7 +133,7 @@ public class AlgaeIntake extends SubsystemBase implements CheckableSubsystem, St
     return currentState;
   }
 
-  public enum AlgaeStates {
+  public enum AlgaeStates implements State {
     IDLE,
     BROKEN,
     INTAKING,

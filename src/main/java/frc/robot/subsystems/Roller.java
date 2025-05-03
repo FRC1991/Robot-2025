@@ -70,9 +70,9 @@ public class Roller extends SubsystemBase implements CheckableSubsystem, StateSu
     return status;
   }
 
-  public void setDesiredState(RollerStates state) {
+  public void setDesiredState(State state) {
     if(this.desiredState != state) {
-      desiredState = state;
+      desiredState = (RollerStates) state;
       handleStateTransition();
     }
   }
@@ -132,7 +132,7 @@ public class Roller extends SubsystemBase implements CheckableSubsystem, StateSu
     return currentState;
   }
 
-  public enum RollerStates {
+  public enum RollerStates implements State {
     IDLE,
     BROKEN,
     INTAKING,

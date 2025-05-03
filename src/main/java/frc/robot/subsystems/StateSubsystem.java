@@ -22,4 +22,8 @@ public interface StateSubsystem {
    * the robot.
    */
   void handleStateTransition();
+
+  void setDesiredState(State e);
+
+  interface State {}
 }

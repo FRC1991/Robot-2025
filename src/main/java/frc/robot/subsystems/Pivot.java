@@ -88,9 +88,9 @@ public class Pivot extends SubsystemBase implements CheckableSubsystem, StateSub
     return status;
   }
 
-  public void setDesiredState(PivotStates state) {
+  public void setDesiredState(State state) {
     if(this.desiredState != state) {
-      desiredState = state;
+      desiredState = (PivotStates) state;
       handleStateTransition();
     }
   }
@@ -156,7 +156,7 @@ public class Pivot extends SubsystemBase implements CheckableSubsystem, StateSub
     return currentState;
   }
 
-  public enum PivotStates {
+  public enum PivotStates implements State {
     IDLE,
     BROKEN,
     STORED,

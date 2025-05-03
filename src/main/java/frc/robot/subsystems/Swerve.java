@@ -545,9 +545,9 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
    * Sets the desired state of the subsystem
    * @param state Desired state
    */
-  public void setDesiredState(SwerveStates state) {
+  public void setDesiredState(State state) {
     if(this.desiredState != state) {
-      desiredState = state;
+      desiredState = (SwerveStates) state;
       handleStateTransition();
     }
   }
@@ -562,7 +562,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
   /**
    * The list of possible states for this subsystem
    */
-  public enum SwerveStates {
+  public enum SwerveStates implements State {
     IDLE,
     BROKEN,
     /** Regular control of the robot */

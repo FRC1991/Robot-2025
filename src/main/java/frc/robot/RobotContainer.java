@@ -7,7 +7,6 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Time;
@@ -20,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.AlgaeIntake;
-import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Manager;
 import frc.robot.subsystems.Swerve;
@@ -91,7 +89,6 @@ public class RobotContainer {
     Swerve.getInstance().setDefaultCommand(new RunCommand(() -> Swerve.getInstance().update(), Swerve.getInstance()));
     // Manual control of pivot for zeroing th encoders during the match
     // Pivot.getInstance().setDefaultCommand(new RunCommand(() -> Pivot.getInstance().motor.set(MathUtil.applyDeadband(-OI.auxController.getRightY(), 0.07)), Climber.getInstance()));
-    Climber.getInstance().setDefaultCommand(new RunCommand(() -> Climber.getInstance().motor.set(MathUtil.applyDeadband(-OI.auxController.getLeftY(), 0.07)), Climber.getInstance()));
 
     // OI.auxController.y()
     //     .onTrue(new InstantCommand(() -> Pivot.getInstance().motor.getEncoder().setPosition(0)));
@@ -119,11 +116,7 @@ public class RobotContainer {
     OI.auxController.leftBumper()
         .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.ALGAE_INTAKE), m_Manager))
         .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
-    
-    OI.auxController.back()
-        .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.OUT_CLIMB), m_Manager))
-        .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.IN_CLIMB), m_Manager));
-    
+        
     // Stops movement by setting the wheels in an X formation
     OI.driverController.rightBumper()
         .onTrue(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.LOCKED), Swerve.getInstance()))
