@@ -22,15 +22,26 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
   private AlgaeIntake algaeIntake = AlgaeIntake.getInstance();
   private Roller roller = Roller.getInstance();
 
+  private static Manager m_Instance;
   private ManagerStates desiredState, currentState = ManagerStates.IDLE;
 
   /** Creates a new Manager. */
-  public Manager() {
+  private Manager() {
     // All subsystems should initialize when calling getInstance()
     initialized &= pivot.getInitialized();
     initialized &= elevator.getInitialized();
     initialized &= algaeIntake.getInitialized();
     initialized &= roller.getInitialized();
+  }
+
+  /**
+   * @return The main Swerve object
+   */
+  public static Manager getInstance() {
+    if(m_Instance == null) {
+      m_Instance = new Manager();
+    }
+    return m_Instance;
   }
 
   /**

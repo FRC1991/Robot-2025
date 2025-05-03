@@ -30,8 +30,6 @@ public class RobotContainer {
 
   private SendableChooser<Command> autoChooser;
 
-  public final Manager m_Manager = new Manager();
-
   public RobotContainer() {
     configureBindings();
     configureElastic();
@@ -46,7 +44,7 @@ public class RobotContainer {
     WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
     
     // Current state of each subsystem and Manager
-    ElasticUtil.putString("Manager State", () -> m_Manager.getState().toString());
+    ElasticUtil.putString("Manager State", () -> Manager.getInstance().getState().toString());
     ElasticUtil.putString("Swerve State", () -> Swerve.getInstance().getState().toString());
     ElasticUtil.putString("Pivot State", () -> Pivot.getInstance().getState().toString());
     ElasticUtil.putString("Elevator State", () -> Elevator.getInstance().getState().toString());
@@ -76,7 +74,7 @@ public class RobotContainer {
       ).withTimeout(0.25),
       // Setting the state to DRIVE for the start of teleop
       new InstantCommand(
-        () -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager
+        () -> Manager.getInstance().setDesiredState(ManagerStates.DRIVE), Manager.getInstance()
       )
     );
 
@@ -97,13 +95,13 @@ public class RobotContainer {
       .whileTrue(new RunCommand(() -> Pivot.getInstance().motor.set(-0.3), Pivot.getInstance()))
       .onFalse(new InstantCommand(() -> Pivot.getInstance().motor.getEncoder().setPosition(0)));
 
-    m_Manager.bindState(OI.auxController.a(), ManagerStates.TAKEOFF, ManagerStates.HOLD);
+    Manager.getInstance().bindState(OI.auxController.a(), ManagerStates.TAKEOFF, ManagerStates.HOLD);
 
-    m_Manager.bindState(OI.auxController.b(), ManagerStates.SPIT, ManagerStates.DRIVE);
+    Manager.getInstance().bindState(OI.auxController.b(), ManagerStates.SPIT, ManagerStates.DRIVE);
 
-    m_Manager.bindState(OI.auxController.rightBumper(), ManagerStates.ALGAE_SCORE, ManagerStates.DRIVE);
+    Manager.getInstance().bindState(OI.auxController.rightBumper(), ManagerStates.ALGAE_SCORE, ManagerStates.DRIVE);
 
-    m_Manager.bindState(OI.auxController.leftBumper(), ManagerStates.ALGAE_INTAKE, ManagerStates.DRIVE);
+    Manager.getInstance().bindState(OI.auxController.leftBumper(), ManagerStates.ALGAE_INTAKE, ManagerStates.DRIVE);
 
     // Stops movement by setting the wheels in an X formation
     Swerve.getInstance().bindState(OI.driverController.rightBumper(), SwerveStates.LOCKED, SwerveStates.DRIVE);
