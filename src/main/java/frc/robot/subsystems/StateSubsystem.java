@@ -3,9 +3,9 @@ package frc.robot.subsystems;
 public interface StateSubsystem {
 
   /**
-   * This should be used like a personalized periodic function for each state.
+   * This should be called in the subsystem's periodic function.
    * Here is also a good place to implement subsystem checks if the subsystem
-   * is implementing the Checkable interface.
+   * is implementing the CheckableSubsystem interface.
    */
   void update();
 

@@ -44,7 +44,7 @@ public class AlgaeIntake extends SubsystemBase implements CheckableSubsystem, St
   }
 
   /**
-   * @return The main Elevator object
+   * @return The main AlgaeIntake object
    */
   public static AlgaeIntake getInstance() {
     if(m_Instance == null) {
@@ -123,6 +123,7 @@ public class AlgaeIntake extends SubsystemBase implements CheckableSubsystem, St
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    update();
   }
 
   /**

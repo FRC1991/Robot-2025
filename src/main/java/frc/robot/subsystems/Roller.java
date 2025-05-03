@@ -123,6 +123,7 @@ public class Roller extends SubsystemBase implements CheckableSubsystem, StateSu
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    update();
   }
 
   /**

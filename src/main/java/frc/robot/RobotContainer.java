@@ -84,15 +84,6 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    m_Manager.setDefaultCommand(new RunCommand(() -> m_Manager.update(), m_Manager));
-    // For driving
-    Swerve.getInstance().setDefaultCommand(new RunCommand(() -> Swerve.getInstance().update(), Swerve.getInstance()));
-    // Manual control of pivot for zeroing th encoders during the match
-    // Pivot.getInstance().setDefaultCommand(new RunCommand(() -> Pivot.getInstance().motor.set(MathUtil.applyDeadband(-OI.auxController.getRightY(), 0.07)), Climber.getInstance()));
-
-    // OI.auxController.y()
-    //     .onTrue(new InstantCommand(() -> Pivot.getInstance().motor.getEncoder().setPosition(0)));
-
     OI.auxController.povUp()
         .whileTrue(new RunCommand(() -> Pivot.getInstance().motor.set(0.3), Pivot.getInstance()))
         .onFalse(new InstantCommand(() -> Pivot.getInstance().motor.getEncoder().setPosition(0)));

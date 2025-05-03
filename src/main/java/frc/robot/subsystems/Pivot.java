@@ -146,6 +146,7 @@ public class Pivot extends SubsystemBase implements CheckableSubsystem, StateSub
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    update();
   }
 
   /**

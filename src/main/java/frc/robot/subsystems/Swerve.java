@@ -154,6 +154,8 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
 
   @Override
   public void periodic() {
+    update();
+    
     // Update the odometry in the periodic block
     m_odometry.update(
         Rotation2d.fromDegrees(getHeading()),
