@@ -28,7 +28,9 @@ import frc.utils.LimelightHelpers;
 import frc.utils.Utils.ElasticUtil;
 import frc.robot.Constants;
 import frc.robot.OI;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSubsystem {
   // Create SwerveModules
@@ -559,6 +561,22 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
    */
   public SwerveStates getState() {
     return currentState;
+  }
+
+  /**
+   * Binds a state to a button. This method helps improve
+   * readability it the code by hiding all of the stuff with
+   * the InstantCommands and just passing in the needed arguments.
+   * 
+   * @param button The Trigger (usually a button) to bind the states to
+   * @param onTrue The state to be active while the button is held down
+   * @param onFalse The state to be active one the button is released
+   * @return Returns the new Trigger for further method chaining
+   */
+  public Trigger bindState(Trigger button, SwerveStates onTrue, SwerveStates onFalse) {
+    return button
+      .onTrue(new InstantCommand(() -> setDesiredState(onTrue), this))
+      .onFalse(new InstantCommand(() -> setDesiredState(onFalse), this));
   }
 
   /**

@@ -64,19 +64,19 @@ public class RobotContainer {
     autoChooser.addOption("leave thing", leave);
 
     SequentialCommandGroup coralOne = new SequentialCommandGroup(
-        new RunCommand(
-            () -> Swerve.getInstance().drive(-0.25, 0, 0, false), Swerve.getInstance()
-        ).withTimeout(2),
-        new InstantCommand(
-            () -> AlgaeIntake.getInstance().setDesiredState(AlgaeStates.INTAKING), AlgaeIntake.getInstance()
-        ).withTimeout(1),
-        new WaitCommand(Time.ofRelativeUnits(2, Units.Seconds)),
-        new RunCommand(
-            () -> Swerve.getInstance().drive(0.3, 0, 0, false), Swerve.getInstance()
-        ).withTimeout(0.5),
-        new InstantCommand(
-            () -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager
-        )
+      new RunCommand(
+        () -> Swerve.getInstance().drive(-0.25, 0, 0, false), Swerve.getInstance()
+      ).withTimeout(2),
+      new InstantCommand(
+        () -> AlgaeIntake.getInstance().setDesiredState(AlgaeStates.INTAKING), AlgaeIntake.getInstance()
+      ).withTimeout(1),
+      new WaitCommand(Time.ofRelativeUnits(2, Units.Seconds)),
+      new RunCommand(
+        () -> Swerve.getInstance().drive(0.3, 0, 0, false), Swerve.getInstance()
+      ).withTimeout(0.5),
+      new InstantCommand(
+        () -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager
+      )
     );
     autoChooser.addOption("coral uno por favor", coralOne);
 
@@ -85,50 +85,33 @@ public class RobotContainer {
 
   private void configureBindings() {
     OI.auxController.povUp()
-        .whileTrue(new RunCommand(() -> Pivot.getInstance().motor.set(0.3), Pivot.getInstance()))
-        .onFalse(new InstantCommand(() -> Pivot.getInstance().motor.getEncoder().setPosition(0)));
+      .whileTrue(new RunCommand(() -> Pivot.getInstance().motor.set(0.3), Pivot.getInstance()))
+      .onFalse(new InstantCommand(() -> Pivot.getInstance().motor.getEncoder().setPosition(0)));
 
     OI.auxController.povDown()
-        .whileTrue(new RunCommand(() -> Pivot.getInstance().motor.set(-0.3), Pivot.getInstance()))
-        .onFalse(new InstantCommand(() -> Pivot.getInstance().motor.getEncoder().setPosition(0)));
+      .whileTrue(new RunCommand(() -> Pivot.getInstance().motor.set(-0.3), Pivot.getInstance()))
+      .onFalse(new InstantCommand(() -> Pivot.getInstance().motor.getEncoder().setPosition(0)));
 
-    OI.auxController.a()
-        .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.TAKEOFF), m_Manager))
-        .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.HOLD), m_Manager));
-    
-    OI.auxController.b()
-        .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.SPIT), m_Manager))
-        .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
-    
-    OI.auxController.rightBumper()
-        .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.ALGAE_SCORE), m_Manager))
-        .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
+    m_Manager.bindState(OI.auxController.a(), ManagerStates.TAKEOFF, ManagerStates.HOLD);
 
-    OI.auxController.leftBumper()
-        .onTrue(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.ALGAE_INTAKE), m_Manager))
-        .onFalse(new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
-        
+    m_Manager.bindState(OI.auxController.b(), ManagerStates.SPIT, ManagerStates.DRIVE);
+
+    m_Manager.bindState(OI.auxController.rightBumper(), ManagerStates.ALGAE_SCORE, ManagerStates.DRIVE);
+
+    m_Manager.bindState(OI.auxController.leftBumper(), ManagerStates.ALGAE_INTAKE, ManagerStates.DRIVE);
+
     // Stops movement by setting the wheels in an X formation
-    OI.driverController.rightBumper()
-        .onTrue(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.LOCKED), Swerve.getInstance()))
-        .onFalse(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.DRIVE), Swerve.getInstance()));
+    Swerve.getInstance().bindState(OI.driverController.rightBumper(), SwerveStates.LOCKED, SwerveStates.DRIVE);
     
     // Removes yaw control and aligns to April tags
-    // OI.driverController.a()
-    //     .onTrue(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.AIMING), Swerve.getInstance()))
-    //     .onFalse(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.DRIVE), Swerve.getInstance()));
+    Swerve.getInstance().bindState(OI.driverController.a(), SwerveStates.AIMING, SwerveStates.DRIVE);
 
-    OI.driverController.a()
-        .onTrue(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.ALIGNING), Swerve.getInstance()))
-        .onFalse(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.DRIVE), Swerve.getInstance()));
-
-    OI.driverController.leftBumper()
-        .onTrue(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.ALIGNING), Swerve.getInstance()))
-        .onFalse(new InstantCommand(() -> Swerve.getInstance().setDesiredState(SwerveStates.DRIVE), Swerve.getInstance()));
+    // Removes yaw control, faces the processor, and nudges the robot towards the center
+    Swerve.getInstance().bindState(OI.driverController.leftBumper(), SwerveStates.ALIGNING, SwerveStates.DRIVE);
     
     // Zeroes out the gyro
     OI.driverController.start()
-        .onTrue(new InstantCommand(() -> Swerve.getInstance().setHeading(0), Swerve.getInstance()));
+      .onTrue(new InstantCommand(() -> Swerve.getInstance().setHeading(0), Swerve.getInstance()));
   }
 
   public Command getAutonomousCommand() {

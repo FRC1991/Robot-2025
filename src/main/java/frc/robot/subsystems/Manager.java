@@ -4,7 +4,9 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.AlgaeIntake.AlgaeStates;
 import frc.robot.subsystems.Elevator.ElevatorStates;
 import frc.robot.subsystems.Pivot.PivotStates;
@@ -170,6 +172,22 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
   public void periodic() {
     // This method will be called once per scheduler run
     update();
+  }
+
+  /**
+   * Binds a state to a button. This method helps improve
+   * readability it the code by hiding all of the stuff with
+   * the InstantCommands and just passing in the needed arguments.
+   * 
+   * @param button The Trigger (usually a button) to bind the states to
+   * @param onTrue The state to be active while the button is held down
+   * @param onFalse The state to be active one the button is released
+   * @return Returns the new Trigger for further method chaining
+   */
+  public Trigger bindState(Trigger button, ManagerStates onTrue, ManagerStates onFalse) {
+    return button
+      .onTrue(new InstantCommand(() -> setDesiredState(onTrue), this))
+      .onFalse(new InstantCommand(() -> setDesiredState(onFalse), this));
   }
 
   /**
