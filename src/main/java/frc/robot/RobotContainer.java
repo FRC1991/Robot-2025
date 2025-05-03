@@ -4,9 +4,6 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Time;
@@ -32,15 +29,10 @@ import frc.utils.Utils.ElasticUtil;
 public class RobotContainer {
 
   private SendableChooser<Command> autoChooser;
-//   private SendableChooser<Command> autoTwo;
 
   public final Manager m_Manager = new Manager();
 
   public RobotContainer() {
-    NamedCommands.registerCommand("DRIVE", new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager));
-    NamedCommands.registerCommand("ALGAE_SCORE", new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.ALGAE_SCORE), m_Manager));
-    NamedCommands.registerCommand("IDLE", new InstantCommand(() -> m_Manager.setDesiredState(ManagerStates.IDLE), m_Manager));
-
     configureBindings();
     configureElastic();
   }
@@ -55,12 +47,10 @@ public class RobotContainer {
     ElasticUtil.putString("AlgaeIntake State", () -> AlgaeIntake.getInstance().getState().toString());
     ElasticUtil.putString("Roller State", () -> Roller.getInstance().getState().toString());
 
-    // This would throw an error no matter what
-    // in last year's code, so let's hope for better
-    // this year.
-    autoChooser = AutoBuilder.buildAutoChooser();
+    autoChooser = new SendableChooser<Command>();
 
     RunCommand leave = new RunCommand(() -> Swerve.getInstance().drive(-0.5, 0, 0, false), Swerve.getInstance());
+    
     autoChooser.addOption("leave thing", leave);
 
     SequentialCommandGroup coralOne = new SequentialCommandGroup(
@@ -78,9 +68,10 @@ public class RobotContainer {
         () -> m_Manager.setDesiredState(ManagerStates.DRIVE), m_Manager
       )
     );
+
     autoChooser.addOption("coral uno por favor", coralOne);
 
-    SmartDashboard.putData("pathplanner chooser", autoChooser);
+    SmartDashboard.putData("Auto", autoChooser);
   }
 
   private void configureBindings() {
