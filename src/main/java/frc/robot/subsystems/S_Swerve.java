@@ -15,19 +15,12 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.robot.Constants.CANConstants;
-import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.SwerveConstants;
-import frc.utils.LimelightHelpers;
+import frc.robot.handlers.CheckableSubsystem;
 import frc.utils.Utils.ElasticUtil;
-import frc.robot.Constants;
-import frc.robot.OI;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
-public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSubsystem {
+public class S_Swerve implements CheckableSubsystem {
   // Create SwerveModules
   private final SwerveModule m_frontLeft = new SwerveModule(
       CANConstants.FRONT_LEFT_DRIVING_ID,
@@ -70,30 +63,22 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
           m_rearRight.getPosition()
       });
 
-  private static Swerve m_Instance;
-
-  private SwerveStates desiredState, currentState = SwerveStates.IDLE;
+  private static S_Swerve m_Instance;
 
   private double desiredHeading;
-  private PIDController angleController = new PIDController(0, 0, 0);
-  private boolean activelyTurning;
   
-  private PIDController alignmentController = new PIDController(0.01, 0, 0);
+  public PIDController alignmentController = new PIDController(0.01, 0, 0);
+  public PIDController angleController = new PIDController(0, 0, 0);
 
   private double p = 0.02, i = 0, d = 0;
-  private double driver = 0.8, lime = 0.2;
 
   // Constructor is private to prevent multiple instances from being made
-  private Swerve() {
-
-    ElasticUtil.putBoolean("Actively turning", () -> activelyTurning);
+  private S_Swerve() {
     ElasticUtil.putDouble("Heading", this::getHeading);
     ElasticUtil.putDouble("Desired heading", () -> desiredHeading);
     ElasticUtil.putDouble("P", () -> this.p, value -> {this.p=value;});
     ElasticUtil.putDouble("I", () -> this.i, value -> {this.i=value;});
     ElasticUtil.putDouble("D", () -> this.d, value -> {this.d=value;});
-    ElasticUtil.putDouble("driver", () -> this.driver, value -> {this.driver=value;});
-    ElasticUtil.putDouble("lime", () -> this.lime, value -> {this.lime=value;});
     ElasticUtil.putDouble("turning power", () -> angleController.calculate(getHeading(), desiredHeading));
     
 
@@ -109,26 +94,11 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
   /**
    * @return The main Swerve object
    */
-  public static Swerve getInstance() {
+  public static S_Swerve getInstance() {
     if(m_Instance == null) {
-      m_Instance = new Swerve();
+      m_Instance = new S_Swerve();
     }
     return m_Instance;
-  }
-
-  @Override
-  public void periodic() {
-    update();
-    
-    // Update the odometry in the periodic block
-    m_odometry.update(
-        Rotation2d.fromDegrees(getHeading()),
-        new SwerveModulePosition[] {
-            m_frontLeft.getPosition(),
-            m_frontRight.getPosition(),
-            m_rearLeft.getPosition(),
-            m_rearRight.getPosition()
-        });
   }
 
   /**
@@ -193,16 +163,6 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
     // Convert the commanded speeds into the correct units for the drivetrain and scaling the speed
     double xSpeedDelivered = xSpeed * SwerveConstants.MAX_SPEED_METERS_PER_SECOND;
     double ySpeedDelivered = ySpeed * SwerveConstants.MAX_SPEED_METERS_PER_SECOND;
-    
-    // if(activelyTurning) {
-    //   desiredHeading = desiredHeading - (rot * SwerveConstants.MAX_DEGREES_PER_SCHEDULER_LOOP);
-    // } else if(rot != 0) {
-    //   desiredHeading = getHeading() - (rot * SwerveConstants.MAX_DEGREES_PER_SCHEDULER_LOOP);
-    // } else {}
-
-    // desiredHeading = MathUtil.inputModulus(desiredHeading, 0, 360);
-
-    // angleController.setPID(p, i, d);
 
     double rotDelivered = 0.7 * rot * SwerveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND * -1;
 
@@ -213,8 +173,6 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(getHeading()))
             : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
     
-    activelyTurning = rot != 0 ? true : false;
-
     setModuleStates(swerveModuleStates);
   }
 
@@ -350,7 +308,6 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
     status &= m_rearLeft.checkSubsystem();
     status &= m_rearRight.checkSubsystem();
     status &= getInitialized();
-    status &= currentState != SwerveStates.BROKEN;
 
     return status;
   }
@@ -363,169 +320,15 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
     return initialized;
   }
 
-  /**
-   * Updates any information the subsystem needs
-   */
-  @Override
-  public void update() {
-    switch(currentState) {
-      case IDLE:
-        setDesiredState(SwerveStates.DRIVE);
-        break;
-      case BROKEN:
-        break;
-      case DRIVE:
-        drive(
-            MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftY()), OIConstants.DRIVER_DEADBAND),
-            MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftX()), OIConstants.DRIVER_DEADBAND),
-            MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getRightX()), OIConstants.DRIVER_DEADBAND),
-            true, SwerveConstants.SPEED_SCALE);
-        break;
-      case AIMING:
-        switch((int) NetworkTableInstance.getDefault().getTable(Constants.LIMELIGHT_NAME).getEntry("tid").getInteger(-1)) {
-          case 0:
-            angleController.setSetpoint(0);
-            break;
-          case 1:
-            angleController.setSetpoint(45);
-            break;
-          case 2:
-            angleController.setSetpoint(90);
-            break;
-          case 3:
-            angleController.setSetpoint(135);
-            break;
-          case 4:
-            angleController.setSetpoint(180);
-            break;
-          case 5:
-            angleController.setSetpoint(225);
-            break;
-          case 6:
-            angleController.setSetpoint(270);
-            break;
-          case 7:
-            angleController.setSetpoint(315);
-            break;
-        }
-        drive(
-            MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftY()), OIConstants.DRIVER_DEADBAND),
-            MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftX()), OIConstants.DRIVER_DEADBAND),
-            0,
-            true, SwerveConstants.SPEED_SCALE);
-        break;
-      case ALIGNING:
-        drive(
-            LimelightHelpers.getTA(Constants.LIMELIGHT_NAME) >= 1.7 ?
-              -driver*MathUtil.applyDeadband(alignmentController.calculate(LimelightHelpers.getTX(Constants.LIMELIGHT_NAME), 0), OIConstants.DRIVER_DEADBAND)
-              + lime*(MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftY()), OIConstants.DRIVER_DEADBAND))
-            :
-              MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftY()), OIConstants.DRIVER_DEADBAND)
-            ,
-            MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftX()), OIConstants.DRIVER_DEADBAND),
-            -angleController.calculate(getHeading(), 270),
-            true, 0.8);
-        break;
-      case MANUAL:
-        drive(
-            MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftY()), OIConstants.DRIVER_DEADBAND),
-            MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftX()), OIConstants.DRIVER_DEADBAND),
-            -angleController.calculate(getHeading(), 270),
-            true, SwerveConstants.SPEED_SCALE);
-        break;
-      case LOCKED:
-        setX();
-        break;
-
-      default:
-        break;
-    }
-
-    // if(!checkSubsystem()) {
-    //   setDesiredState(SwerveStates.BROKEN);
-    // }
-  }
-
-  /**
-   * Handles moving from one state to another
-   */
-  @Override
-  public void handleStateTransition() {
-    switch(desiredState) {
-      case IDLE:
-        stop();
-        break;
-      case BROKEN:
-        stop();
-        break;
-      case DRIVE:
-        break;
-      case AIMING:
-        break;
-      case ALIGNING:
-        break;
-      case MANUAL:
-        break;
-      case LOCKED:
-        setX();
-        break;
-
-      default:
-        break;
-    }
-
-    currentState = desiredState;
-  }
-
-  /**
-   * Sets the desired state of the subsystem
-   * @param state Desired state
-   */
-  public void setDesiredState(State state) {
-    if(this.desiredState != state) {
-      desiredState = (SwerveStates) state;
-      handleStateTransition();
-    }
-  }
-
-  /**
-   * @return The current state of the subsystem
-   */
-  public SwerveStates getState() {
-    return currentState;
-  }
-
-  /**
-   * Binds a state to a button. This method helps improve
-   * readability it the code by hiding all of the stuff with
-   * the InstantCommands and just passing in the needed arguments.
-   * 
-   * @param button The Trigger (usually a button) to bind the states to
-   * @param onTrue The state to be active while the button is held down
-   * @param onFalse The state to be active one the button is released
-   * @return Returns the new Trigger for further method chaining
-   */
-  public Trigger bindState(Trigger button, SwerveStates onTrue, SwerveStates onFalse) {
-    return button
-      .onTrue(new InstantCommand(() -> setDesiredState(onTrue), this))
-      .onFalse(new InstantCommand(() -> setDesiredState(onFalse), this));
-  }
-
-  /**
-   * The list of possible states for this subsystem
-   */
-  public enum SwerveStates implements State {
-    IDLE,
-    BROKEN,
-    /** Regular control of the robot */
-    DRIVE,
-    /** Aims towards the angle of the April tags around the field.
-     * This takes away yaw control from the driver.
-     */
-    AIMING,
-    ALIGNING,
-    MANUAL,
-    /** Removes all control and locks the wheels in an X formation */
-    LOCKED;
+  public void updateOdometry() {
+    // Update the odometry
+    m_odometry.update(
+        Rotation2d.fromDegrees(getHeading()),
+        new SwerveModulePosition[] {
+            m_frontLeft.getPosition(),
+            m_frontRight.getPosition(),
+            m_rearLeft.getPosition(),
+            m_rearRight.getPosition()
+        });
   }
 }

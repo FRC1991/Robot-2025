@@ -12,14 +12,14 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.CANConstants;
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.handlers.CheckableSubsystem;
 import frc.utils.Utils;
 import frc.utils.Utils.ElasticUtil;
 
-public class Elevator extends SubsystemBase implements CheckableSubsystem, StateSubsystem {
+public class S_Elevator implements CheckableSubsystem {
 
   private boolean status = false;
   private boolean initialized = false;
@@ -28,12 +28,10 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
 
   private PIDController posController;
 
-  private static Elevator m_Instance;
-
-  private ElevatorStates desiredState, currentState = ElevatorStates.IDLE;
+  private static S_Elevator m_Instance;
 
   /** Creates a new Arm. */
-  private Elevator() {
+  private S_Elevator() {
     motor1 = new SparkMax(CANConstants.ELEVATOR_MOTOR_ONE_ID, MotorType.kBrushless);
     motor2 = new SparkMax(CANConstants.ELEVATOR_MOTOR_TWO_ID, MotorType.kBrushless);
 
@@ -48,11 +46,11 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
     motor2.configure(elevatorConfig, ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
 
-    posController = new PIDController(2, 0, 0);
-    posController.setTolerance(ElevatorConstants.PID_ERROR_TOLERANCE);
-
     motor1.getEncoder().setPosition(0);
     motor2.getEncoder().setPosition(0);
+
+    posController = new PIDController(2, 0, 0);
+    posController.setTolerance(ElevatorConstants.PID_ERROR_TOLERANCE);
 
     ElasticUtil.putDouble("Elevator Position", this::getEncoder);
     ElasticUtil.putDouble("elevator pos 1", motor1.getEncoder()::getPosition);
@@ -66,16 +64,36 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
   /**
    * @return The main Elevator object
    */
-  public static Elevator getInstance() {
+  public static S_Elevator getInstance() {
     if(m_Instance == null) {
-      m_Instance = new Elevator();
+      m_Instance = new S_Elevator();
     }
     return m_Instance;
   }
 
-  private void set(double speed) {
-    motor1.set(speed);
-    motor2.set(-speed);
+  /**
+   * @param speed The speed of the elevator [-1, 1]
+   */
+  public void set(double speed) {
+    speed = Utils.normalize(speed);
+    motor1.set(-speed);
+    motor2.set(speed);
+  }
+
+  /**
+   * Sets the internal PID controller to the given setpoint
+   * @param setpoint A positional setpoint for the elevator to move towards
+   */
+  public void setSetpoint(double setpoint) {
+    posController.setSetpoint(setpoint);
+  }
+
+  /**
+   * Updates the speed of the motors based on their current position
+   * moving towards the setpoint
+   */
+  public void moveToSetpoint() {
+    set(posController.calculate(getEncoder()));
   }
 
   @Override
@@ -102,92 +120,5 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
     status = getInitialized();
 
     return status;
-  }
-
-  public void setDesiredState(State state) {
-    if(this.desiredState != state) {
-      desiredState = (ElevatorStates) state;
-      handleStateTransition();
-    }
-  }
-
-  @Override
-  public void handleStateTransition() {
-    switch(desiredState) {
-      case IDLE:
-        stop();
-        break;
-      case BROKEN:
-        stop();
-        break;
-      case INTAKING:
-        posController.setSetpoint(ElevatorConstants.INTAKING_POSITION);
-        break;
-      case STORED:
-        posController.setSetpoint(ElevatorConstants.STORED_POSITION);
-        break;
-      case L1:
-        posController.setSetpoint(ElevatorConstants.L1_POSITION_INCHES);
-        break;
-      case L2:
-        posController.setSetpoint(ElevatorConstants.L2_POSITION_INCHES);
-        break;
-
-      default:
-        break;
-    }
-
-    currentState = desiredState;
-  }
-
-  public void update() {
-    switch(currentState) {
-      case IDLE:
-        break;
-      case BROKEN:
-        break;
-      case INTAKING:
-        set(Utils.normalize(-posController.calculate(getEncoder())));
-        break;
-      case STORED:
-        set(Utils.normalize(-posController.calculate(getEncoder())));
-        break;
-      case L1:
-        set(Utils.normalize(-posController.calculate(getEncoder())));
-        break;
-      case L2:
-        set(Utils.normalize(-posController.calculate(getEncoder())));
-        break;
-        
-
-      default:
-        break;
-    }
-
-    if(!checkSubsystem()) {
-      setDesiredState(ElevatorStates.BROKEN);
-    }
-  }
-
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-    update();
-  }
-
-  /**
-   * @return The current state of the subsystem
-   */
-  public ElevatorStates getState() {
-    return currentState;
-  }
-
-  public enum ElevatorStates implements State {
-    IDLE,
-    BROKEN,
-    INTAKING,
-    STORED,
-    L1,
-    L2,
   }
 }
