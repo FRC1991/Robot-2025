@@ -55,9 +55,9 @@ public class Swerve extends SubsystemBase implements StateSubsystem {
         break;
       case DRIVE:
         swerve.drive(
-            MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftY()), OIConstants.DRIVER_DEADBAND),
-            MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftX()), OIConstants.DRIVER_DEADBAND),
-            MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getRightX()), OIConstants.DRIVER_DEADBAND),
+            OI.getDriveLeftY(),
+            OI.getDriveLeftX(),
+            OI.getDriveRightX(),
             true, SwerveConstants.SPEED_SCALE);
         break;
       case AIMING:
@@ -88,22 +88,22 @@ public class Swerve extends SubsystemBase implements StateSubsystem {
             break;
         }
         swerve.drive(
-            MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftY()), OIConstants.DRIVER_DEADBAND),
-            MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftX()), OIConstants.DRIVER_DEADBAND),
-            0,
-            true, SwerveConstants.SPEED_SCALE);
+          OI.getDriveLeftY(),
+          OI.getDriveLeftX(),
+          -swerve.angleController.calculate(swerve.getHeading()),
+          true, SwerveConstants.SPEED_SCALE);
         break;
       case ALIGNING:
         swerve.drive(
-            LimelightHelpers.getTA(Constants.LIMELIGHT_NAME) >= 1.7 ?
-              -lime*MathUtil.applyDeadband(swerve.alignmentController.calculate(LimelightHelpers.getTX(Constants.LIMELIGHT_NAME), 0), OIConstants.DRIVER_DEADBAND)
-              + driver*(MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftY()), OIConstants.DRIVER_DEADBAND))
-            :
-              MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftY()), OIConstants.DRIVER_DEADBAND)
-            ,
-            MathUtil.applyDeadband(OI.mappingFunction(OI.driverController.getLeftX()), OIConstants.DRIVER_DEADBAND),
-            -swerve.angleController.calculate(swerve.getHeading(), 270),
-            true, 0.8);
+          LimelightHelpers.getTA(Constants.LIMELIGHT_NAME) >= 1.7 ?
+            -lime * MathUtil.applyDeadband(swerve.alignmentController.calculate(LimelightHelpers.getTX(Constants.LIMELIGHT_NAME), 0), OIConstants.DRIVER_DEADBAND)
+            + driver * OI.getDriveLeftY()
+          :
+            OI.getDriveLeftY()
+          ,
+          OI.getDriveLeftX(),
+          -swerve.angleController.calculate(swerve.getHeading(), 270),
+          true, 0.8);
         break;
       case LOCKED:
         swerve.setX();

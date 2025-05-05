@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -19,6 +20,34 @@ public abstract class OI {
   // The Driver's joystick
   public static final CommandXboxController driverController = new CommandXboxController(OIConstants.DRIVER_CONTROLLER_PORT);
   public static final CommandXboxController auxController = new CommandXboxController(OIConstants.AUX_CONTROLLER_PORT);
+
+  public static double getDriveLeftX() {
+    return MathUtil.applyDeadband(
+      OI.mappingFunction(OI.driverController.getLeftX()),
+      OIConstants.DRIVER_DEADBAND
+    );
+  }
+
+  public static double getDriveLeftY() {
+    return MathUtil.applyDeadband(
+      OI.mappingFunction(OI.driverController.getLeftY()),
+      OIConstants.DRIVER_DEADBAND
+    );
+  }
+
+  public static double getDriveRightX() {
+    return MathUtil.applyDeadband(
+      OI.mappingFunction(OI.driverController.getRightX()),
+      OIConstants.DRIVER_DEADBAND
+    );
+  }
+
+  public static double getDriveRightY() {
+    return MathUtil.applyDeadband(
+      OI.mappingFunction(OI.driverController.getRightY()),
+      OIConstants.DRIVER_DEADBAND
+    );
+  }
 
   // A half second rumble on the aux controller
   public static void rumbleAuxController() {
