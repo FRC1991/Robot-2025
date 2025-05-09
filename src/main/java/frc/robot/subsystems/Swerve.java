@@ -5,10 +5,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -20,7 +16,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.CANConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.SwerveConstants;
@@ -28,7 +23,9 @@ import frc.utils.LimelightHelpers;
 import frc.utils.Utils.ElasticUtil;
 import frc.robot.Constants;
 import frc.robot.OI;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSubsystem {
   // Create SwerveModules
@@ -73,8 +70,6 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
           m_rearRight.getPosition()
       });
 
-  private ChassisSpeeds m_RobotChassisSpeeds = new ChassisSpeeds();
-
   private static Swerve m_Instance;
 
   private SwerveStates desiredState, currentState = SwerveStates.IDLE;
@@ -108,37 +103,6 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
 
     alignmentController.setTolerance(1);
 
-    try {
-      RobotConfig PP_CONFIG = RobotConfig.fromGUISettings();
-
-      // Configure AutoBuilder last
-      AutoBuilder.configure(
-          this::getPose, // Robot pose supplier
-          this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
-          this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-          (speeds, feedforwards) -> drive(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
-          new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-              new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-              new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
-          ),
-          PP_CONFIG, // The robot configuration
-          () -> {
-            // Boolean supplier that controls when the path will be mirrored for the red alliance
-            // This will flip the path being followed to the red side of the field.
-            // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-
-            var alliance = DriverStation.getAlliance();
-            if (alliance.isPresent()) {
-              return alliance.get() == DriverStation.Alliance.Red;
-            }
-            return false;
-          },
-          this // Reference to this subsystem to set requirements
-      );
-    } catch (Exception e) {
-
-    }
-
     setHeading(180);
   }
 
@@ -154,6 +118,8 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
 
   @Override
   public void periodic() {
+    update();
+    
     // Update the odometry in the periodic block
     m_odometry.update(
         Rotation2d.fromDegrees(getHeading()),
@@ -207,41 +173,11 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
   }
 
   /**
-   * Used in the Pathplanner AutoBuilder.configureHolonomic
-   *
-   * @return The ChassisSpeeds relative to the robot
-   */
-  private ChassisSpeeds getRobotRelativeSpeeds() {
-    m_RobotChassisSpeeds = SwerveConstants.DRIVE_KINEMATICS.toChassisSpeeds(
-      m_frontLeft.getState(),
-      m_frontRight.getState(),
-      m_rearLeft.getState(),
-      m_rearRight.getState()
-    );
-    return m_RobotChassisSpeeds;
-  }
-
-  /**
    * 
    * @return distance the wheels have traveled in meters
    */
   public double getDistanceTraveledStraight() {
     return Math.abs(m_frontLeft.getPosition().distanceMeters);
-  }
-
-  /**
-   * Drives the robot according to ChassisSpeeds provided
-   * by Pathplanner during auto
-   *
-   * @param t ChassisSpeeds relative to the robot
-   */
-  private void drive(ChassisSpeeds t) {
-    // var swerveModuleStates = SwerveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(t);
-    drive(t.vxMetersPerSecond, t.vyMetersPerSecond, t.omegaRadiansPerSecond, false);
-    // m_frontLeft.setDesiredState(swerveModuleStates[0]);
-    // m_frontRight.setDesiredState(swerveModuleStates[1]);
-    // m_rearLeft.setDesiredState(swerveModuleStates[2]);
-    // m_rearRight.setDesiredState(swerveModuleStates[3]);
   }
 
   /**
@@ -545,9 +481,9 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
    * Sets the desired state of the subsystem
    * @param state Desired state
    */
-  public void setDesiredState(SwerveStates state) {
+  public void setDesiredState(State state) {
     if(this.desiredState != state) {
-      desiredState = state;
+      desiredState = (SwerveStates) state;
       handleStateTransition();
     }
   }
@@ -560,9 +496,25 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
   }
 
   /**
+   * Binds a state to a button. This method helps improve
+   * readability it the code by hiding all of the stuff with
+   * the InstantCommands and just passing in the needed arguments.
+   * 
+   * @param button The Trigger (usually a button) to bind the states to
+   * @param onTrue The state to be active while the button is held down
+   * @param onFalse The state to be active one the button is released
+   * @return Returns the new Trigger for further method chaining
+   */
+  public Trigger bindState(Trigger button, SwerveStates onTrue, SwerveStates onFalse) {
+    return button
+      .onTrue(new InstantCommand(() -> setDesiredState(onTrue), this))
+      .onFalse(new InstantCommand(() -> setDesiredState(onFalse), this));
+  }
+
+  /**
    * The list of possible states for this subsystem
    */
-  public enum SwerveStates {
+  public enum SwerveStates implements State {
     IDLE,
     BROKEN,
     /** Regular control of the robot */

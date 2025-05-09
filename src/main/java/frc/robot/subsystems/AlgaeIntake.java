@@ -16,7 +16,6 @@ import frc.robot.Constants.CANConstants;
 import frc.robot.Constants;
 import frc.robot.Constants.AlgaeConstants;
 
-// This is for the coral
 public class AlgaeIntake extends SubsystemBase implements CheckableSubsystem, StateSubsystem {
 
   private boolean status = false;
@@ -45,7 +44,7 @@ public class AlgaeIntake extends SubsystemBase implements CheckableSubsystem, St
   }
 
   /**
-   * @return The main Elevator object
+   * @return The main AlgaeIntake object
    */
   public static AlgaeIntake getInstance() {
     if(m_Instance == null) {
@@ -71,9 +70,9 @@ public class AlgaeIntake extends SubsystemBase implements CheckableSubsystem, St
     return status;
   }
 
-  public void setDesiredState(AlgaeStates state) {
+  public void setDesiredState(State state) {
     if(this.desiredState != state) {
-      desiredState = state;
+      desiredState = (AlgaeStates) state;
       handleStateTransition();
     }
   }
@@ -124,6 +123,7 @@ public class AlgaeIntake extends SubsystemBase implements CheckableSubsystem, St
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    update();
   }
 
   /**
@@ -133,7 +133,7 @@ public class AlgaeIntake extends SubsystemBase implements CheckableSubsystem, St
     return currentState;
   }
 
-  public enum AlgaeStates {
+  public enum AlgaeStates implements State {
     IDLE,
     BROKEN,
     INTAKING,

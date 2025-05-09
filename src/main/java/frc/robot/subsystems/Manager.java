@@ -4,9 +4,10 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.AlgaeIntake.AlgaeStates;
-import frc.robot.subsystems.Climber.ClimberStates;
 import frc.robot.subsystems.Elevator.ElevatorStates;
 import frc.robot.subsystems.Pivot.PivotStates;
 import frc.robot.subsystems.Roller.RollerStates;
@@ -20,18 +21,27 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
   private Elevator elevator = Elevator.getInstance();
   private AlgaeIntake algaeIntake = AlgaeIntake.getInstance();
   private Roller roller = Roller.getInstance();
-  private Climber climber = Climber.getInstance();
 
+  private static Manager m_Instance;
   private ManagerStates desiredState, currentState = ManagerStates.IDLE;
 
   /** Creates a new Manager. */
-  public Manager() {
+  private Manager() {
     // All subsystems should initialize when calling getInstance()
     initialized &= pivot.getInitialized();
     initialized &= elevator.getInitialized();
     initialized &= algaeIntake.getInitialized();
     initialized &= roller.getInitialized();
-    initialized &= climber.getInitialized();
+  }
+
+  /**
+   * @return The main Swerve object
+   */
+  public static Manager getInstance() {
+    if(m_Instance == null) {
+      m_Instance = new Manager();
+    }
+    return m_Instance;
   }
 
   /**
@@ -43,7 +53,6 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
     elevator.stop();
     algaeIntake.stop();
     roller.stop();
-    climber.stop();
   }
 
   /**
@@ -63,7 +72,6 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
     status &= elevator.checkSubsystem();
     status &= algaeIntake.checkSubsystem();
     status &= roller.checkSubsystem();
-    status &= climber.checkSubsystem();
 
     return status;
   }
@@ -73,12 +81,6 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
    */
   @Override
   public void update() {
-    pivot.update();
-    elevator.update();
-    algaeIntake.update();
-    roller.update();
-    climber.update();
-    
     switch(currentState) {
       case IDLE:
         // The robot should never be IDLE in a match
@@ -150,22 +152,7 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
         elevator.setDesiredState(ElevatorStates.STORED);
         algaeIntake.setDesiredState(AlgaeStates.IDLE);
         roller.setDesiredState(RollerStates.SCORING);
-        break;
-      case OUT_CLIMB:
-        pivot.setDesiredState(PivotStates.STORED);
-        elevator.setDesiredState(ElevatorStates.STORED);
-        algaeIntake.setDesiredState(AlgaeStates.IDLE);
-        roller.setDesiredState(RollerStates.IDLE);
-        climber.setDesiredState(ClimberStates.OUT);
-        break;
-      case IN_CLIMB:
-        pivot.setDesiredState(PivotStates.STORED);
-        elevator.setDesiredState(ElevatorStates.STORED);
-        algaeIntake.setDesiredState(AlgaeStates.IDLE);
-        roller.setDesiredState(RollerStates.IDLE);
-        climber.setDesiredState(ClimberStates.IN);
-        break;
-      
+        break;      
 
       default:
         break;
@@ -178,9 +165,9 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
    * Sets the desired state of the subsystem
    * @param state Desired state
    */
-  public void setDesiredState(ManagerStates state) {
+  public void setDesiredState(State state) {
     if(this.desiredState != state) {
-      desiredState = state;
+      desiredState = (ManagerStates) state;
       handleStateTransition();
     }
   }
@@ -195,6 +182,23 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    update();
+  }
+
+  /**
+   * Binds a state to a button. This method helps improve
+   * readability it the code by hiding all of the stuff with
+   * the InstantCommands and just passing in the needed arguments.
+   * 
+   * @param button The Trigger (usually a button) to bind the states to
+   * @param onTrue The state to be active while the button is held down
+   * @param onFalse The state to be active one the button is released
+   * @return Returns the new Trigger for further method chaining
+   */
+  public Trigger bindState(Trigger button, ManagerStates onTrue, ManagerStates onFalse) {
+    return button
+      .onTrue(new InstantCommand(() -> setDesiredState(onTrue), this))
+      .onFalse(new InstantCommand(() -> setDesiredState(onFalse), this));
   }
 
   /**
@@ -209,7 +213,7 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
    * robot is broken. In that scenario the robot would be E-stopped
    * anyway and no code would run be running.
   */
-  public enum ManagerStates {
+  public enum ManagerStates implements State {
     IDLE,
     /** Just driving the robot around */
     DRIVE,
@@ -220,7 +224,5 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
     TAKEOFF,
     SPIT,
     HOLD,
-    OUT_CLIMB,
-    IN_CLIMB,
   }
 }

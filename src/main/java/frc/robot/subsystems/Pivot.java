@@ -19,7 +19,6 @@ import frc.robot.Constants.PivotConstants;
 import frc.utils.Utils;
 import frc.utils.Utils.ElasticUtil;
 
-// This is for the coral
 public class Pivot extends SubsystemBase implements CheckableSubsystem, StateSubsystem {
 
   private boolean status = false;
@@ -88,9 +87,9 @@ public class Pivot extends SubsystemBase implements CheckableSubsystem, StateSub
     return status;
   }
 
-  public void setDesiredState(PivotStates state) {
+  public void setDesiredState(State state) {
     if(this.desiredState != state) {
-      desiredState = state;
+      desiredState = (PivotStates) state;
       handleStateTransition();
     }
   }
@@ -147,6 +146,7 @@ public class Pivot extends SubsystemBase implements CheckableSubsystem, StateSub
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    update();
   }
 
   /**
@@ -156,7 +156,7 @@ public class Pivot extends SubsystemBase implements CheckableSubsystem, StateSub
     return currentState;
   }
 
-  public enum PivotStates {
+  public enum PivotStates implements State {
     IDLE,
     BROKEN,
     STORED,

@@ -104,9 +104,9 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
     return status;
   }
 
-  public void setDesiredState(ElevatorStates state) {
+  public void setDesiredState(State state) {
     if(this.desiredState != state) {
-      desiredState = state;
+      desiredState = (ElevatorStates) state;
       handleStateTransition();
     }
   }
@@ -172,6 +172,7 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    update();
   }
 
   /**
@@ -181,7 +182,7 @@ public class Elevator extends SubsystemBase implements CheckableSubsystem, State
     return currentState;
   }
 
-  public enum ElevatorStates {
+  public enum ElevatorStates implements State {
     IDLE,
     BROKEN,
     INTAKING,
