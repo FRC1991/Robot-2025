@@ -74,28 +74,6 @@ public abstract class OI {
     rumbleDriverController();
   }
 
-  public static double[] getMappedJoysticks() {
-    // Convert XY to polar for mapping
-    double inputTranslationDir = Math.atan2(driverController.getLeftY(), driverController.getLeftX());
-    double inputTranslationMag = Math.sqrt(Math.pow(driverController.getLeftY(), 2) + Math.pow(driverController.getLeftX(), 2));
-
-    // Deadband
-    if(inputTranslationMag <= OIConstants.DRIVER_DEADBAND) {
-      return new double[] {0,0};
-    // Exceeding the maximum value
-    } else if(inputTranslationMag > 1) {
-      return new double[] {0.70710678118, 0.70710678118};
-    }
-
-    double outputTranslationMag = mappingFunction(inputTranslationMag);
-
-    // Converting the polar coords back to cartesian coords.
-    return new double[] {
-      outputTranslationMag * Math.cos(inputTranslationDir),
-      outputTranslationMag * Math.sin(inputTranslationDir)
-    };
-  }
-
   /**
    * The mapping function is a collection of three,
    * fifth order, polynomial, functions combined together
