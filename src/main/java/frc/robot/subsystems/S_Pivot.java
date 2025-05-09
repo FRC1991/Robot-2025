@@ -39,10 +39,10 @@ public class S_Pivot implements CheckableSubsystem {
     SparkMaxConfig pivotConfig = new SparkMaxConfig();
 
     pivotConfig.idleMode(IdleMode.kBrake)
-        .smartCurrentLimit(Constants.NEO_CURRENT_LIMIT);
+      .smartCurrentLimit(Constants.NEO_CURRENT_LIMIT);
 
     motor.configure(pivotConfig, ResetMode.kResetSafeParameters,
-        PersistMode.kPersistParameters);
+      PersistMode.kPersistParameters);
 
     ElasticUtil.putDouble("pivot P", () -> this.p, value -> {this.p=value;});
     ElasticUtil.putDouble("pivot I", () -> this.i, value -> {this.i=value;});

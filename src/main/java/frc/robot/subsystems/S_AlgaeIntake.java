@@ -32,10 +32,10 @@ public class S_AlgaeIntake implements CheckableSubsystem {
     SparkMaxConfig algaeIntakeConfig = new SparkMaxConfig();
 
     algaeIntakeConfig.idleMode(IdleMode.kBrake)
-        .smartCurrentLimit(Constants.CURRENT_LIMIT_550);
+      .smartCurrentLimit(Constants.CURRENT_LIMIT_550);
 
     motor.configure(algaeIntakeConfig, ResetMode.kResetSafeParameters,
-        PersistMode.kPersistParameters);
+      PersistMode.kPersistParameters);
 
     initialized = true;
     status = true;

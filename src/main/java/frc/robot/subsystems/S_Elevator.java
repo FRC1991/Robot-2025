@@ -38,13 +38,13 @@ public class S_Elevator implements CheckableSubsystem {
     SparkMaxConfig elevatorConfig = new SparkMaxConfig();
 
     elevatorConfig.idleMode(IdleMode.kBrake)
-        .smartCurrentLimit(Constants.NEO_CURRENT_LIMIT)
-        .encoder.positionConversionFactor(ElevatorConstants.ELEVATOR_MOTOR_REDUCTION);
+      .smartCurrentLimit(Constants.NEO_CURRENT_LIMIT)
+      .encoder.positionConversionFactor(ElevatorConstants.ELEVATOR_MOTOR_REDUCTION);
 
     motor1.configure(elevatorConfig, ResetMode.kResetSafeParameters,
-        PersistMode.kPersistParameters);
+      PersistMode.kPersistParameters);
     motor2.configure(elevatorConfig, ResetMode.kResetSafeParameters,
-        PersistMode.kPersistParameters);
+      PersistMode.kPersistParameters);
 
     motor1.getEncoder().setPosition(0);
     motor2.getEncoder().setPosition(0);

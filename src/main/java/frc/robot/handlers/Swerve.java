@@ -55,10 +55,10 @@ public class Swerve extends SubsystemBase implements StateSubsystem {
         break;
       case DRIVE:
         swerve.drive(
-            OI.getDriveLeftY(),
-            OI.getDriveLeftX(),
-            OI.getDriveRightX(),
-            true, SwerveConstants.SPEED_SCALE);
+          OI.getDriveLeftY(),
+          OI.getDriveLeftX(),
+          OI.getDriveRightX(),
+          true, SwerveConstants.SPEED_SCALE);
         break;
       case AIMING:
         switch((int) NetworkTableInstance.getDefault().getTable(Constants.LIMELIGHT_NAME).getEntry("tid").getInteger(-1)) {

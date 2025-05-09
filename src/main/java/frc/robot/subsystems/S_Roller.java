@@ -32,10 +32,10 @@ public class S_Roller implements CheckableSubsystem {
     SparkMaxConfig S_RollersConfig = new SparkMaxConfig();
 
     S_RollersConfig.idleMode(IdleMode.kBrake)
-        .smartCurrentLimit(Constants.NEO_CURRENT_LIMIT);
+      .smartCurrentLimit(Constants.NEO_CURRENT_LIMIT);
 
     motor.configure(S_RollersConfig, ResetMode.kResetSafeParameters,
-        PersistMode.kPersistParameters);
+      PersistMode.kPersistParameters);
 
     initialized = true;
     status = true;

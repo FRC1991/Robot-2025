@@ -23,28 +23,28 @@ import frc.utils.Utils.ElasticUtil;
 public class S_Swerve implements CheckableSubsystem {
   // Create SwerveModules
   private final SwerveModule m_frontLeft = new SwerveModule(
-      CANConstants.FRONT_LEFT_DRIVING_ID,
-      CANConstants.FRONT_LEFT_TURNING_ID,
-      CANConstants.FL_ENCODER_ANALOG_INPUT_CHANNEL,
-      SwerveConstants.FRONT_LEFT_CHASSIS_ANGULAR_OFFSET);
+    CANConstants.FRONT_LEFT_DRIVING_ID,
+    CANConstants.FRONT_LEFT_TURNING_ID,
+    CANConstants.FL_ENCODER_ANALOG_INPUT_CHANNEL,
+    SwerveConstants.FRONT_LEFT_CHASSIS_ANGULAR_OFFSET);
 
   private final SwerveModule m_frontRight = new SwerveModule(
-      CANConstants.FRONT_RIGHT_DRIVING_ID,
-      CANConstants.FRONT_RIGHT_TURNING_ID,
-      CANConstants.FR_ENCODER_ANALOG_INPUT_CHANNEL,
-      SwerveConstants.FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET);
+    CANConstants.FRONT_RIGHT_DRIVING_ID,
+    CANConstants.FRONT_RIGHT_TURNING_ID,
+    CANConstants.FR_ENCODER_ANALOG_INPUT_CHANNEL,
+    SwerveConstants.FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET);
 
   private final SwerveModule m_rearLeft = new SwerveModule(
-      CANConstants.BACK_LEFT_DRIVING_ID,
-      CANConstants.BACK_LEFT_TURNING_ID,
-      CANConstants.BL_ENCODER_ANALOG_INPUT_CHANNEL,
-      SwerveConstants.BACK_LEFT_CHASSIS_ANGULAR_OFFSET);
+    CANConstants.BACK_LEFT_DRIVING_ID,
+    CANConstants.BACK_LEFT_TURNING_ID,
+    CANConstants.BL_ENCODER_ANALOG_INPUT_CHANNEL,
+    SwerveConstants.BACK_LEFT_CHASSIS_ANGULAR_OFFSET);
 
   private final SwerveModule m_rearRight = new SwerveModule(
-      CANConstants.BACK_RIGHT_DRIVING_ID,
-      CANConstants.BACK_RIGHT_TURNING_ID,
-      CANConstants.BR_ENCODER_ANALOG_INPUT_CHANNEL,
-      SwerveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET);
+    CANConstants.BACK_RIGHT_DRIVING_ID,
+    CANConstants.BACK_RIGHT_TURNING_ID,
+    CANConstants.BR_ENCODER_ANALOG_INPUT_CHANNEL,
+    SwerveConstants.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET);
 
   private boolean status = false;
   private boolean initialized = false;
@@ -54,14 +54,14 @@ public class S_Swerve implements CheckableSubsystem {
 
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
-      SwerveConstants.DRIVE_KINEMATICS,
-      Rotation2d.fromDegrees(getHeading()),
-      new SwerveModulePosition[] {
-          m_frontLeft.getPosition(),
-          m_frontRight.getPosition(),
-          m_rearLeft.getPosition(),
-          m_rearRight.getPosition()
-      });
+    SwerveConstants.DRIVE_KINEMATICS,
+    Rotation2d.fromDegrees(getHeading()),
+    new SwerveModulePosition[] {
+      m_frontLeft.getPosition(),
+      m_frontRight.getPosition(),
+      m_rearLeft.getPosition(),
+      m_rearRight.getPosition()
+    });
 
   private static S_Swerve m_Instance;
 
@@ -119,14 +119,14 @@ public class S_Swerve implements CheckableSubsystem {
    */
   public void resetOdometry(Pose2d pose) {
     m_odometry.resetPosition(
-        Rotation2d.fromDegrees(getHeading()),
-        new SwerveModulePosition[] {
-            m_frontLeft.getPosition(),
-            m_frontRight.getPosition(),
-            m_rearLeft.getPosition(),
-            m_rearRight.getPosition()
-        },
-        pose);
+      Rotation2d.fromDegrees(getHeading()),
+      new SwerveModulePosition[] {
+        m_frontLeft.getPosition(),
+        m_frontRight.getPosition(),
+        m_rearLeft.getPosition(),
+        m_rearRight.getPosition()
+      },
+      pose);
   }
 
   /**
@@ -215,7 +215,7 @@ public class S_Swerve implements CheckableSubsystem {
    */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(
-        desiredStates, SwerveConstants.MAX_SPEED_METERS_PER_SECOND);
+      desiredStates, SwerveConstants.MAX_SPEED_METERS_PER_SECOND);
     m_frontLeft.setDesiredState(desiredStates[0]);
     m_frontRight.setDesiredState(desiredStates[1]);
     m_rearLeft.setDesiredState(desiredStates[2]);
@@ -229,10 +229,10 @@ public class S_Swerve implements CheckableSubsystem {
    */
   public SwerveModuleState[] getModuleStates() {
     return new SwerveModuleState[] {
-        m_frontLeft.getState(),
-        m_frontRight.getState(),
-        m_rearLeft.getState(),
-        m_rearRight.getState()
+      m_frontLeft.getState(),
+      m_frontRight.getState(),
+      m_rearLeft.getState(),
+      m_rearRight.getState()
     };
   }
 

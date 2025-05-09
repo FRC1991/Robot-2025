@@ -46,9 +46,9 @@ public class Utils {
   public static class ElasticUtil {
 
     static Notification defaultSetter = new Notification()
-        .withTitle("Setter not configured")
-        .withLevel(NotificationLevel.WARNING)
-        .withDisplaySeconds(5);
+      .withTitle("Setter not configured")
+      .withLevel(NotificationLevel.WARNING)
+      .withDisplaySeconds(5);
     /**
      * This method automatically adds this value to the SmartDashboard.
      * **Important** to note: This does not add a setter to the value, so DO NOT
