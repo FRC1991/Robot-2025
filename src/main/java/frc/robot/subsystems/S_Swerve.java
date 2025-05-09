@@ -68,23 +68,17 @@ public class S_Swerve implements CheckableSubsystem {
   private double desiredHeading;
   
   public PIDController alignmentController = new PIDController(0.01, 0, 0);
-  public PIDController angleController = new PIDController(0, 0, 0);
-
-  private double p = 0.02, i = 0, d = 0;
+  public PIDController angleController = new PIDController(0.02, 0, 0);
 
   // Constructor is private to prevent multiple instances from being made
   private S_Swerve() {
     ElasticUtil.putDouble("Heading", this::getHeading);
     ElasticUtil.putDouble("Desired heading", () -> desiredHeading);
-    ElasticUtil.putDouble("P", () -> this.p, value -> {this.p=value;});
-    ElasticUtil.putDouble("I", () -> this.i, value -> {this.i=value;});
-    ElasticUtil.putDouble("D", () -> this.d, value -> {this.d=value;});
     ElasticUtil.putDouble("turning power", () -> angleController.calculate(getHeading(), desiredHeading));
     
 
     angleController.setTolerance(2);
     angleController.enableContinuousInput(0, 360);
-    angleController.setPID(p, i, d);
 
     alignmentController.setTolerance(1);
 
@@ -163,15 +157,14 @@ public class S_Swerve implements CheckableSubsystem {
     // Convert the commanded speeds into the correct units for the drivetrain and scaling the speed
     double xSpeedDelivered = xSpeed * SwerveConstants.MAX_SPEED_METERS_PER_SECOND;
     double ySpeedDelivered = ySpeed * SwerveConstants.MAX_SPEED_METERS_PER_SECOND;
-
-    double rotDelivered = 0.7 * rot * SwerveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND * -1;
+    double rotDelivered = SwerveConstants.ROTATION_SPEED_SCALE * rot * SwerveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
 
     rotDelivered = rotDelivered * (SwerveConstants.GYRO_REVERSED ? -1 : 1);
 
     var swerveModuleStates = SwerveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
-        fieldRelative
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(getHeading()))
-            : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
+      fieldRelative
+        ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(getHeading()))
+        : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
     
     setModuleStates(swerveModuleStates);
   }
@@ -323,12 +316,12 @@ public class S_Swerve implements CheckableSubsystem {
   public void updateOdometry() {
     // Update the odometry
     m_odometry.update(
-        Rotation2d.fromDegrees(getHeading()),
-        new SwerveModulePosition[] {
-            m_frontLeft.getPosition(),
-            m_frontRight.getPosition(),
-            m_rearLeft.getPosition(),
-            m_rearRight.getPosition()
-        });
+      Rotation2d.fromDegrees(getHeading()),
+      new SwerveModulePosition[] {
+        m_frontLeft.getPosition(),
+        m_frontRight.getPosition(),
+        m_rearLeft.getPosition(),
+        m_rearRight.getPosition()
+      });
   }
 }
