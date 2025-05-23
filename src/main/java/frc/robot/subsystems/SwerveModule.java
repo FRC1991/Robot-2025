@@ -23,6 +23,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import frc.robot.Constants.ModuleConstants;
 import frc.robot.Constants.SwerveConstants;
+import frc.robot.handlers.CheckableSubsystem;
 import frc.utils.Utils;
 import frc.utils.Utils.ElasticUtil;
 
@@ -82,9 +83,9 @@ public class SwerveModule implements CheckableSubsystem {
     driveTalonConfig.Slot0.kD = 0;
 
     turningConfig
-        .idleMode(IdleMode.kBrake)
-        .smartCurrentLimit(40)
-        .encoder.positionConversionFactor(ModuleConstants.TURNING_MOTOR_REDUCTION);
+      .idleMode(IdleMode.kBrake)
+      .smartCurrentLimit(40)
+      .encoder.positionConversionFactor(ModuleConstants.TURNING_MOTOR_REDUCTION);
 
     // Apply the configuration to the motor, so it is always in
     // a consistent state regardless of what has happened to the
@@ -94,7 +95,7 @@ public class SwerveModule implements CheckableSubsystem {
     driveMotor.getPosition().setUpdateFrequency(4);
 
     turningMotor.configure(turningConfig, ResetMode.kResetSafeParameters,
-        PersistMode.kPersistParameters);
+      PersistMode.kPersistParameters);
     turningMotor.getEncoder().setPosition(m_turningEncoder.get());
     ElasticUtil.putDouble("encoder " + encoderChannel, m_turningEncoder::get);
 
@@ -114,7 +115,7 @@ public class SwerveModule implements CheckableSubsystem {
     // Apply chassis angular offset to the encoder position to get the position
     // relative to the chassis.
     return new SwerveModuleState(driveMotor.getVelocity().getValueAsDouble(),
-        new Rotation2d(getEncoderRadians()));
+      new Rotation2d(getEncoderRadians()));
   }
 
   /**
@@ -143,8 +144,8 @@ public class SwerveModule implements CheckableSubsystem {
     // Apply chassis angular offset to the encoder position to get the position
     // relative to the chassis.
     return new SwerveModulePosition(
-        driveMotor.getPosition().getValueAsDouble(),
-        new Rotation2d(getEncoderRadians() - m_chassisAngularOffset));
+      driveMotor.getPosition().getValueAsDouble(),
+      new Rotation2d(getEncoderRadians() - m_chassisAngularOffset));
   }
 
   /**

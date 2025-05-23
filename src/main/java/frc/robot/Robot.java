@@ -7,12 +7,12 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.subsystems.Manager;
-import frc.robot.subsystems.Roller;
-import frc.robot.subsystems.Swerve;
-import frc.robot.subsystems.Manager.ManagerStates;
-import frc.robot.subsystems.Roller.RollerStates;
-import frc.robot.subsystems.Swerve.SwerveStates;
+import frc.robot.handlers.Manager;
+import frc.robot.handlers.Manager.ManagerStates;
+import frc.robot.handlers.Roller;
+import frc.robot.handlers.Roller.RollerStates;
+import frc.robot.handlers.Swerve;
+import frc.robot.handlers.Swerve.SwerveStates;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;

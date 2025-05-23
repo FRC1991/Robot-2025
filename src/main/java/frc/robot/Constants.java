@@ -28,6 +28,9 @@ public abstract class Constants {
     // The speed modifier for the swerve drive as a percent
     public static final double SPEED_SCALE = 1;
     public static final double LINE_UP_SPEED_SCALE = 0.2;
+    // Applies after the SPEED_SCALE. If SPEED_SCALE=0.5 and
+    // this is also 0.5 the turning speed will be 0.25.
+    public static final double ROTATION_SPEED_SCALE = 0.7;
 
     // Chassis configuration
     public static final double TRACK_WIDTH = Units.inchesToMeters(22.5);
@@ -46,7 +49,7 @@ public abstract class Constants {
     public static final double BACK_LEFT_CHASSIS_ANGULAR_OFFSET = 0 - 0.226; // GOOD
     public static final double BACK_RIGHT_CHASSIS_ANGULAR_OFFSET = -(Math.PI / 2) + 0.226;
 
-    public static final boolean GYRO_REVERSED = true;
+    public static final boolean GYRO_REVERSED = false;
 
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds

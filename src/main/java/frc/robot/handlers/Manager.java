@@ -2,25 +2,29 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package frc.robot.handlers;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.subsystems.AlgaeIntake.AlgaeStates;
-import frc.robot.subsystems.Elevator.ElevatorStates;
-import frc.robot.subsystems.Pivot.PivotStates;
-import frc.robot.subsystems.Roller.RollerStates;
+import frc.robot.subsystems.S_AlgaeIntake;
+import frc.robot.subsystems.S_Elevator;
+import frc.robot.subsystems.S_Pivot;
+import frc.robot.subsystems.S_Roller;
+import frc.robot.handlers.AlgaeIntake.AlgaeStates;
+import frc.robot.handlers.Elevator.ElevatorStates;
+import frc.robot.handlers.Pivot.PivotStates;
+import frc.robot.handlers.Roller.RollerStates;
 
 public class Manager extends SubsystemBase implements CheckableSubsystem, StateSubsystem {
 
   private boolean status = false;
   private boolean initialized = false;
 
-  private Pivot pivot = Pivot.getInstance();
-  private Elevator elevator = Elevator.getInstance();
-  private AlgaeIntake algaeIntake = AlgaeIntake.getInstance();
-  private Roller roller = Roller.getInstance();
+  private S_Pivot pivot = S_Pivot.getInstance();
+  private S_Elevator elevator = S_Elevator.getInstance();
+  private S_AlgaeIntake algaeIntake = S_AlgaeIntake.getInstance();
+  private S_Roller roller = S_Roller.getInstance();
 
   private static Manager m_Instance;
   private ManagerStates desiredState, currentState = ManagerStates.IDLE;
@@ -112,46 +116,46 @@ public class Manager extends SubsystemBase implements CheckableSubsystem, StateS
   public void handleStateTransition() {
     switch(desiredState) {
       case IDLE:
-        pivot.setDesiredState(PivotStates.IDLE);
-        elevator.setDesiredState(ElevatorStates.IDLE);
-        algaeIntake.setDesiredState(AlgaeStates.IDLE);
-        roller.setDesiredState(RollerStates.IDLE);
+        Pivot.getInstance().setDesiredState(PivotStates.IDLE);
+        Elevator.getInstance().setDesiredState(ElevatorStates.IDLE);
+        AlgaeIntake.getInstance().setDesiredState(AlgaeStates.IDLE);
+        Roller.getInstance().setDesiredState(RollerStates.IDLE);
         break;
       case DRIVE:
-        pivot.setDesiredState(PivotStates.STORED);
-        elevator.setDesiredState(ElevatorStates.STORED);
-        algaeIntake.setDesiredState(AlgaeStates.IDLE);
-        roller.setDesiredState(RollerStates.IDLE);
+        Pivot.getInstance().setDesiredState(PivotStates.STORED);
+        Elevator.getInstance().setDesiredState(ElevatorStates.STORED);
+        AlgaeIntake.getInstance().setDesiredState(AlgaeStates.IDLE);
+        Roller.getInstance().setDesiredState(RollerStates.IDLE);
         break;
       case ALGAE_INTAKE:
-        pivot.setDesiredState(PivotStates.INTAKING);
-        elevator.setDesiredState(ElevatorStates.STORED);
-        algaeIntake.setDesiredState(AlgaeStates.INTAKING);
-        roller.setDesiredState(RollerStates.IDLE);
+        Pivot.getInstance().setDesiredState(PivotStates.INTAKING);
+        Elevator.getInstance().setDesiredState(ElevatorStates.STORED);
+        AlgaeIntake.getInstance().setDesiredState(AlgaeStates.INTAKING);
+        Roller.getInstance().setDesiredState(RollerStates.IDLE);
         break;
       case ALGAE_SCORE:
-        pivot.setDesiredState(PivotStates.SCORING);
-        elevator.setDesiredState(ElevatorStates.STORED);
-        algaeIntake.setDesiredState(AlgaeStates.SCORING);
-        roller.setDesiredState(RollerStates.IDLE);
+        Pivot.getInstance().setDesiredState(PivotStates.SCORING);
+        Elevator.getInstance().setDesiredState(ElevatorStates.STORED);
+        AlgaeIntake.getInstance().setDesiredState(AlgaeStates.SCORING);
+        Roller.getInstance().setDesiredState(RollerStates.IDLE);
         break;
       case TAKEOFF:
-        pivot.setDesiredState(PivotStates.STORED);
-        elevator.setDesiredState(ElevatorStates.L2);
-        algaeIntake.setDesiredState(AlgaeStates.IDLE);
-        roller.setDesiredState(RollerStates.INTAKING);
+        Pivot.getInstance().setDesiredState(PivotStates.STORED);
+        Elevator.getInstance().setDesiredState(ElevatorStates.L2);
+        AlgaeIntake.getInstance().setDesiredState(AlgaeStates.IDLE);
+        Roller.getInstance().setDesiredState(RollerStates.INTAKING);
         break;
       case HOLD:
-        pivot.setDesiredState(PivotStates.STORED);
-        elevator.setDesiredState(ElevatorStates.STORED);
-        algaeIntake.setDesiredState(AlgaeStates.IDLE);
-        roller.setDesiredState(RollerStates.INTAKING);
+        Pivot.getInstance().setDesiredState(PivotStates.STORED);
+        Elevator.getInstance().setDesiredState(ElevatorStates.STORED);
+        AlgaeIntake.getInstance().setDesiredState(AlgaeStates.IDLE);
+        Roller.getInstance().setDesiredState(RollerStates.INTAKING);
         break;
       case SPIT:
-        pivot.setDesiredState(PivotStates.STORED);
-        elevator.setDesiredState(ElevatorStates.STORED);
-        algaeIntake.setDesiredState(AlgaeStates.IDLE);
-        roller.setDesiredState(RollerStates.SCORING);
+        Pivot.getInstance().setDesiredState(PivotStates.STORED);
+        Elevator.getInstance().setDesiredState(ElevatorStates.STORED);
+        AlgaeIntake.getInstance().setDesiredState(AlgaeStates.IDLE);
+        Roller.getInstance().setDesiredState(RollerStates.SCORING);
         break;      
 
       default:

@@ -15,15 +15,17 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.subsystems.AlgaeIntake;
-import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Manager;
-import frc.robot.subsystems.Swerve;
-import frc.robot.subsystems.AlgaeIntake.AlgaeStates;
-import frc.robot.subsystems.Manager.ManagerStates;
-import frc.robot.subsystems.Swerve.SwerveStates;
-import frc.robot.subsystems.Pivot;
-import frc.robot.subsystems.Roller;
+import frc.robot.handlers.AlgaeIntake;
+import frc.robot.handlers.Manager;
+import frc.robot.handlers.Manager.ManagerStates;
+import frc.robot.handlers.Pivot;
+import frc.robot.handlers.Roller;
+import frc.robot.handlers.Swerve;
+import frc.robot.subsystems.S_Swerve;
+import frc.robot.handlers.AlgaeIntake.AlgaeStates;
+import frc.robot.handlers.Elevator;
+import frc.robot.handlers.Swerve.SwerveStates;
+import frc.robot.subsystems.S_Pivot;
 import frc.utils.Utils.ElasticUtil;
 
 public class RobotContainer {
@@ -53,14 +55,14 @@ public class RobotContainer {
 
     autoChooser = new SendableChooser<Command>();
 
-    RunCommand leave = new RunCommand(() -> Swerve.getInstance().drive(-0.5, 0, -Swerve.getInstance().angleController.calculate(Swerve.getInstance().getHeading(), 180), false), Swerve.getInstance());
+    RunCommand leave = new RunCommand(() -> S_Swerve.getInstance().drive(-0.5, 0, -S_Swerve.getInstance().angleController.calculate(S_Swerve.getInstance().getHeading(), 180), false), Swerve.getInstance());
     
     autoChooser.addOption("leave thing", leave);
 
     SequentialCommandGroup coralOne = new SequentialCommandGroup(
       // Driving up to the reef with the ground intake facing the reef
       new RunCommand(
-        () -> Swerve.getInstance().drive(-0.4, 0, -Swerve.getInstance().angleController.calculate(Swerve.getInstance().getHeading(), 180), false), Swerve.getInstance()
+        () -> S_Swerve.getInstance().drive(-0.4, 0, -S_Swerve.getInstance().angleController.calculate(S_Swerve.getInstance().getHeading(), 180), false), Swerve.getInstance()
       ).withTimeout(2),
       // Spitting the coral off of the robot and into the trough
       new InstantCommand(
@@ -70,7 +72,7 @@ public class RobotContainer {
       new WaitCommand(Time.ofRelativeUnits(3, Units.Seconds)),
       // Driving away from the reef, so the robot doesn't support the coral at the end of auto
       new RunCommand(
-        () -> Swerve.getInstance().drive(0.3, 0, -Swerve.getInstance().angleController.calculate(Swerve.getInstance().getHeading(), 180), false), Swerve.getInstance()
+        () -> S_Swerve.getInstance().drive(0.3, 0, -S_Swerve.getInstance().angleController.calculate(S_Swerve.getInstance().getHeading(), 180), false), Swerve.getInstance()
       ).withTimeout(0.25),
       // Setting the state to DRIVE for the start of teleop
       new InstantCommand(
@@ -93,12 +95,12 @@ public class RobotContainer {
    */
   private void configureBindings() {
     OI.auxController.povUp()
-      .whileTrue(new RunCommand(() -> Pivot.getInstance().motor.set(0.3), Pivot.getInstance()))
-      .onFalse(new InstantCommand(() -> Pivot.getInstance().motor.getEncoder().setPosition(0)));
+      .whileTrue(new RunCommand(() -> S_Pivot.getInstance().set(0.3), Pivot.getInstance()))
+      .onFalse(new InstantCommand(() -> S_Pivot.getInstance().zeroEncoder()));
 
     OI.auxController.povDown()
-      .whileTrue(new RunCommand(() -> Pivot.getInstance().motor.set(-0.3), Pivot.getInstance()))
-      .onFalse(new InstantCommand(() -> Pivot.getInstance().motor.getEncoder().setPosition(0)));
+      .whileTrue(new RunCommand(() -> S_Pivot.getInstance().set(-0.3), Pivot.getInstance()))
+      .onFalse(new InstantCommand(() -> S_Pivot.getInstance().zeroEncoder()));
 
     Manager.getInstance().bindState(OI.auxController.a(), ManagerStates.TAKEOFF, ManagerStates.HOLD);
 
@@ -119,7 +121,7 @@ public class RobotContainer {
     
     // Zeroes out the gyro
     OI.driverController.start()
-      .onTrue(new InstantCommand(() -> Swerve.getInstance().setHeading(0), Swerve.getInstance()));
+      .onTrue(new InstantCommand(() -> S_Swerve.getInstance().setHeading(0), Swerve.getInstance()));
   }
 
   /**
