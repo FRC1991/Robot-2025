@@ -33,8 +33,8 @@ public class AlgaeIntake extends SubsystemBase implements CheckableSubsystem, St
 
     SparkMaxConfig algaeIntakeConfig = new SparkMaxConfig();
 
-    algaeIntakeConfig.idleMode(IdleMode.kBrake)
-        .smartCurrentLimit(Constants.CURRENT_LIMIT_550);
+    algaeIntakeConfig.idleMode(IdleMode.kCoast)
+      .smartCurrentLimit(Constants.NEO_CURRENT_LIMIT);
 
     motor.configure(algaeIntakeConfig, ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
@@ -107,8 +107,10 @@ public class AlgaeIntake extends SubsystemBase implements CheckableSubsystem, St
       case BROKEN:
         break;
       case INTAKING:
+        motor.set(AlgaeConstants.INTAKE_SPEED);
         break;
       case SCORING:
+        motor.set(AlgaeConstants.SCORING_SPEED);
         break;
 
       default:

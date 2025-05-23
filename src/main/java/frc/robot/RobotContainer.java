@@ -53,32 +53,37 @@ public class RobotContainer {
 
     autoChooser = new SendableChooser<Command>();
 
-    RunCommand leave = new RunCommand(() -> Swerve.getInstance().drive(-0.5, 0, 0, false), Swerve.getInstance());
+    RunCommand leave = new RunCommand(() -> Swerve.getInstance().drive(-0.5, 0, -Swerve.getInstance().angleController.calculate(Swerve.getInstance().getHeading(), 180), false), Swerve.getInstance());
     
     autoChooser.addOption("leave thing", leave);
 
     SequentialCommandGroup coralOne = new SequentialCommandGroup(
       // Driving up to the reef with the ground intake facing the reef
       new RunCommand(
-        () -> Swerve.getInstance().drive(-0.25, 0, 0, false), Swerve.getInstance()
+        () -> Swerve.getInstance().drive(-0.4, 0, -Swerve.getInstance().angleController.calculate(Swerve.getInstance().getHeading(), 180), false), Swerve.getInstance()
       ).withTimeout(2),
       // Spitting the coral off of the robot and into the trough
       new InstantCommand(
         () -> AlgaeIntake.getInstance().setDesiredState(AlgaeStates.INTAKING), AlgaeIntake.getInstance()
-      ).withTimeout(1),
+      ),
       // Waiting for the coral to settle
-      new WaitCommand(Time.ofRelativeUnits(2, Units.Seconds)),
+      new WaitCommand(Time.ofRelativeUnits(3, Units.Seconds)),
       // Driving away from the reef, so the robot doesn't support the coral at the end of auto
       new RunCommand(
-        () -> Swerve.getInstance().drive(0.3, 0, 0, false), Swerve.getInstance()
+        () -> Swerve.getInstance().drive(0.3, 0, -Swerve.getInstance().angleController.calculate(Swerve.getInstance().getHeading(), 180), false), Swerve.getInstance()
       ).withTimeout(0.25),
       // Setting the state to DRIVE for the start of teleop
       new InstantCommand(
         () -> Manager.getInstance().setDesiredState(ManagerStates.DRIVE), Manager.getInstance()
+      ),
+      new InstantCommand(
+        () -> AlgaeIntake.getInstance().setDesiredState(AlgaeStates.IDLE), AlgaeIntake.getInstance()
       )
     );
 
     autoChooser.addOption("coral uno por favor", coralOne);
+
+    autoChooser.addOption("Nothing", new InstantCommand());
 
     SmartDashboard.putData("Auto", autoChooser);
   }

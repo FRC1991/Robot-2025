@@ -119,8 +119,8 @@ public abstract class Constants {
   }
 
   public static abstract class AlgaeConstants {
-    public static final double INTAKE_SPEED = 1;
-    public static final double SCORING_SPEED = -1;
+    public static final double INTAKE_SPEED = 0.6;
+    public static final double SCORING_SPEED = -0.6;
   }
 
   public static abstract class ElevatorConstants {

@@ -81,7 +81,7 @@ public class Swerve extends SubsystemBase implements CheckableSubsystem, StateSu
   private PIDController alignmentController = new PIDController(0.01, 0, 0);
 
   private double p = 0.02, i = 0, d = 0;
-  private double driver = 0.8, lime = 0.2;
+  private double driver = 0.6, lime = 0.4;
 
   // Constructor is private to prevent multiple instances from being made
   private Swerve() {
