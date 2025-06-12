@@ -13,7 +13,6 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import frc.robot.Constants.CANConstants;
 import frc.robot.Constants;
-import frc.robot.handlers.CheckableSubsystem;
 import frc.utils.Utils;
 
 public class S_Roller implements CheckableSubsystem {

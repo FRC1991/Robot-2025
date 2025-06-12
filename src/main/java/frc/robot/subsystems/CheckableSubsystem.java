@@ -1,4 +1,4 @@
-package frc.robot.handlers;
+package frc.robot.subsystems;
 
 public interface CheckableSubsystem {
 

@@ -15,7 +15,6 @@ import edu.wpi.first.math.controller.PIDController;
 import frc.robot.Constants;
 import frc.robot.Constants.CANConstants;
 import frc.robot.Constants.ElevatorConstants;
-import frc.robot.handlers.CheckableSubsystem;
 import frc.utils.Utils;
 import frc.utils.Utils.ElasticUtil;
 

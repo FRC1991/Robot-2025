@@ -12,7 +12,6 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import frc.robot.Constants.CANConstants;
-import frc.robot.handlers.CheckableSubsystem;
 import frc.utils.Utils;
 import frc.robot.Constants;
 

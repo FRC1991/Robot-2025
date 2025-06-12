@@ -17,7 +17,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.Constants.CANConstants;
 import frc.robot.Constants.SwerveConstants;
-import frc.robot.handlers.CheckableSubsystem;
 import frc.utils.Utils.ElasticUtil;
 
 public class S_Swerve implements CheckableSubsystem {
